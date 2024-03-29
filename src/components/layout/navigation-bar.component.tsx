@@ -20,7 +20,7 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
-import { AppContext } from "@/app/app-provider";
+import { AppContext } from "@/providers/app-provider";
 
 const drawerWidth = 250;
 

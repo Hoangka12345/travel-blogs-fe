@@ -2,7 +2,7 @@
 
 import { useContext, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-import { AppContext } from "@/app/app-provider";
+import { AppContext } from "@/providers/app-provider";
 
 export default function AutoChangeToken() {
     const { token, updateAccessToken } = useContext(AppContext);

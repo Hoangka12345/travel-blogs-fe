@@ -3,8 +3,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import AppProvider from "./app-provider";
+import AppProvider from "../providers/app-provider";
 import AutoChangeToken from "@/components/auto-change-token.component";
+import UserProvider from "@/providers/user-provider";
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -23,10 +24,12 @@ export default function RootLayout({
         <html lang="en">
             <body>
                 <AppProvider access_token={access_token} refresh_token={refresh_token}>
-                    <LayoutProvider>
-                        {children}
-                        <AutoChangeToken />
-                    </LayoutProvider>
+                    <UserProvider>
+                        <LayoutProvider>
+                            {children}
+                            <AutoChangeToken />
+                        </LayoutProvider>
+                    </UserProvider>
                 </AppProvider>
                 <ToastContainer />
             </body>
