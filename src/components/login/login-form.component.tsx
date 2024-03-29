@@ -25,12 +25,14 @@ import { loginFormSchema } from "@/validations/login-form.zod";
 import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { AppContext } from "@/app/app-provider";
+import { AppContext } from "@/providers/app-provider";
+import { UserContext } from "@/providers/user-provider";
 
 export default function LoginForm() {
     const router = useRouter();
 
     const { updateAccessToken } = useContext(AppContext);
+    const { updateUser } = useContext(UserContext);
 
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({
@@ -99,10 +101,13 @@ export default function LoginForm() {
                         body: JSON.stringify(res.data),
                     });
                     if (fetchToken.status === 200) {
+                        console.log(res.data);
+
                         updateAccessToken({
                             access_token: res.data.access_token,
                             refresh_token: res.data.refresh_token,
                         });
+                        updateUser(res.data.user);
                         router.push("/");
                     }
                 } catch (error) {

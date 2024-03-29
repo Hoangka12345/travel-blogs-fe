@@ -7,7 +7,8 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
 import LoginIcon from "@mui/icons-material/Login";
 import { useRouter } from "next/navigation";
-import { AppContext } from "@/app/app-provider";
+import { AppContext } from "@/providers/app-provider";
+import { UserContext } from "@/providers/user-provider";
 
 const Search = styled("div")(({ theme }) => ({
     position: "relative",
@@ -37,6 +38,7 @@ const theme = createTheme();
 export default function HeaderLayout() {
     const router = useRouter();
     const { token } = useContext(AppContext);
+    const { user } = useContext(UserContext);
 
     const onClickLogin = () => router.push("/login");
 
@@ -67,9 +69,18 @@ export default function HeaderLayout() {
                 {token.access_token ? (
                     <>
                         <NotificationsIcon />
-                        <Avatar sx={{ width: 35, height: 35 }}>H</Avatar>
+                        <Avatar
+                            alt="avatar"
+                            src={user.avatar ? user.avatar : "/imgs/img1.jpg"}
+                            sx={{ width: 35, height: 35 }}
+                        />
                         <Typography variant="h6" fontWeight={600}>
-                            Phan Bảo Hoàng
+                            <Typography component={"span"}>
+                                {user.lastName && user.lastName}{" "}
+                            </Typography>
+                            <Typography component={"span"}>
+                                {user.firstName && user.firstName}
+                            </Typography>
                         </Typography>
                     </>
                 ) : (

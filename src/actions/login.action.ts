@@ -16,6 +16,7 @@ export default async function loginAction(data: any): Promise<I_Response<any>> {
                 data: {
                     access_token: res.access_token,
                     refresh_token: res.refresh_token,
+                    user: res.user
                 }
             }
         } else {
