@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import AppProvider from "../providers/app-provider";
 import AutoChangeToken from "@/components/auto-change-token.component";
 import UserProvider from "@/providers/user-provider";
+import BlogProvider from "@/providers/blog-provider";
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -19,16 +20,21 @@ export default function RootLayout({
 }>) {
     const cookieStore = cookies();
     const access_token = cookieStore.get("access_token")?.value;
-    const refresh_token = cookieStore.get("access_token")?.value;
+    const refresh_token = cookieStore.get("refresh_token")?.value;
+    const userCookie = cookieStore.get("user");
+    const userInfo = JSON.parse(userCookie?.value || "");
+
     return (
         <html lang="en">
             <body>
                 <AppProvider access_token={access_token} refresh_token={refresh_token}>
-                    <UserProvider>
-                        <LayoutProvider>
-                            {children}
-                            <AutoChangeToken />
-                        </LayoutProvider>
+                    <UserProvider userInfo={userInfo}>
+                        <BlogProvider>
+                            <LayoutProvider>
+                                {children}
+                                <AutoChangeToken />
+                            </LayoutProvider>
+                        </BlogProvider>
                     </UserProvider>
                 </AppProvider>
                 <ToastContainer />

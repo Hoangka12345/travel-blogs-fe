@@ -40,7 +40,11 @@ export default function HeaderLayout() {
     const { token } = useContext(AppContext);
     const { user } = useContext(UserContext);
 
+    console.log(user);
+
     const onClickLogin = () => router.push("/login");
+
+    const onClickProfile = () => router.push(`/profile/${user._id}`);
 
     return (
         <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
@@ -72,9 +76,15 @@ export default function HeaderLayout() {
                         <Avatar
                             alt="avatar"
                             src={user.avatar ? user.avatar : "/imgs/img1.jpg"}
-                            sx={{ width: 35, height: 35 }}
+                            sx={{ width: 35, height: 35, cursor: "pointer" }}
+                            onClick={onClickProfile}
                         />
-                        <Typography variant="h6" fontWeight={600}>
+                        <Typography
+                            variant="h6"
+                            fontWeight={600}
+                            onClick={onClickProfile}
+                            sx={{ cursor: "pointer" }}
+                        >
                             <Typography component={"span"}>
                                 {user.lastName && user.lastName}{" "}
                             </Typography>

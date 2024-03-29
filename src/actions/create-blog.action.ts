@@ -2,9 +2,9 @@
 
 import { I_Response } from "@/interfaces/response.interface"
 
-export default async function registerAction(data: FormData): Promise<I_Response<any>> {
+export default async function createBlogAction(data: FormData): Promise<I_Response<any>> {
     try {
-        const resPromise = await fetch(`${process.env.URL_API}/auth/register`, {
+        const resPromise = await fetch(`${process.env.URL_API}/blog`, {
             method: "POST",
             body: data
         })

@@ -1,5 +1,3 @@
-"use server";
-
 import CreateForm from "@/components/create-blog/create-form.component";
 import { Paper } from "@mui/material";
 
