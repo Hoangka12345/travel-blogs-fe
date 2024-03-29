@@ -9,23 +9,26 @@ interface I_User {
     avatar: string;
 }
 
+const initialUser: I_User = {
+    _id: "",
+    firstName: "",
+    lastName: "",
+    avatar: "",
+};
+
 export const UserContext = createContext({
-    user: {
-        _id: "",
-        firstName: "",
-        lastName: "",
-        avatar: "",
-    },
+    user: initialUser,
     updateUser: (user: I_User) => {},
 });
 
-export default function UserProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<I_User>({
-        _id: "",
-        firstName: "",
-        lastName: "",
-        avatar: "",
-    });
+export default function UserProvider({
+    children,
+    userInfo = initialUser,
+}: {
+    children: ReactNode;
+    userInfo?: I_User;
+}) {
+    const [user, setUser] = useState<I_User>(userInfo);
     const updateUser = (newUser: I_User) => setUser(newUser);
 
     return (

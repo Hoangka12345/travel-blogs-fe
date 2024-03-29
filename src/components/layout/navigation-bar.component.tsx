@@ -59,6 +59,7 @@ export default function NavigationBar() {
     const handleLogout = async () => {
         await fetch("/api/logout");
         updateAccessToken({ access_token: "", refresh_token: "" });
+        router.push("/");
     };
 
     return (

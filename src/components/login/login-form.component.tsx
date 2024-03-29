@@ -101,8 +101,6 @@ export default function LoginForm() {
                         body: JSON.stringify(res.data),
                     });
                     if (fetchToken.status === 200) {
-                        console.log(res.data);
-
                         updateAccessToken({
                             access_token: res.data.access_token,
                             refresh_token: res.data.refresh_token,

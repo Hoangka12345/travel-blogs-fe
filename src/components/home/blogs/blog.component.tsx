@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     Avatar,
     Box,
@@ -16,7 +16,6 @@ import {
     Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import ImageIcon from "@mui/icons-material/Image";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import SmsIcon from "@mui/icons-material/Sms";
@@ -26,6 +25,9 @@ import BookmarkAddedOutlinedIcon from "@mui/icons-material/BookmarkAddedOutlined
 import BlogComment from "./blog-comment.component";
 import ImageSlider from "@/components/images-slide.component";
 import ImageShow from "@/components/image-show.component";
+import { I_Blog } from "@/interfaces/blog.interface";
+import moment from "moment";
+import { useRouter } from "next/navigation";
 
 const StackReaction = styled(Stack)(({ theme }) => ({
     padding: `${theme.spacing(0.8)} ${theme.spacing(4)}`,
@@ -36,20 +38,19 @@ const StackReaction = styled(Stack)(({ theme }) => ({
     },
 }));
 
-const images = ["/imgs/img1.jpg", "/imgs/img2.jpg", "/imgs/img3.jpg", "/imgs/img4.jpg"];
+export default function Blog({ blog }: { blog: I_Blog }) {
+    const router = useRouter();
 
-export default function Blog() {
-    const [contents, setContents] = useState([
-        { title: "Địa điểm du lịch", content: "" },
-        { title: "Quốc gia", content: "" },
-        { title: "Thành Phố", content: "" },
-        { title: "nội dung nhận xét", content: "" },
-    ]);
     const [isLike, setIsLike] = useState<boolean>(false);
     const [likeNumber, setLikeNumber] = useState<number>(1);
     const [openSLide, setOpenSlide] = useState<boolean>(false);
     const [imageIndex, setImageIndex] = useState<number>(0);
     const [isSaved, setIsSaved] = useState<boolean>(false);
+
+    const timeAgo = useMemo(() => {
+        const createdTime = new Date(blog.createdAt);
+        return moment(createdTime).fromNow();
+    }, [blog.createdAt]);
 
     const handleCloseSlide = () => setOpenSlide(false);
     const handleOpenSlide = (index: number) => {
@@ -57,17 +58,30 @@ export default function Blog() {
         setImageIndex(index);
     };
 
+    const onClickProfile = () => {
+        if (blog.user._id) {
+            router.push(`/profile/${blog.user._id}`);
+        }
+    };
+
     return (
         <Paper sx={{ paddingTop: 1, paddingX: 1 }}>
             {/* name */}
             <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                 <ListItem>
-                    <ListItemAvatar>
-                        <Avatar>
-                            <ImageIcon />
-                        </Avatar>
+                    <ListItemAvatar sx={{ cursor: "pointer" }} onClick={onClickProfile}>
+                        <Avatar src={blog.user.avatar && blog.user.avatar} />
                     </ListItemAvatar>
-                    <ListItemText primary="Phan Bảo Hoàng" secondary="Jan 9, 2014" />
+                    <ListItemText
+                        onClick={onClickProfile}
+                        sx={{ cursor: "pointer" }}
+                        primary={
+                            blog.user.firstName &&
+                            blog.user.lastName &&
+                            `${blog.user.lastName} ${blog.user.firstName}`
+                        }
+                        secondary={timeAgo}
+                    />
                 </ListItem>
                 <Tooltip title={isSaved ? "đã lưu" : "lưu blog"}>
                     <IconButton>
@@ -81,19 +95,44 @@ export default function Blog() {
             </Box>
             {/* main content */}
             <Stack spacing={1}>
-                {contents.map((content) => (
-                    <Box key={content.title}>
-                        <Typography component={"span"} fontWeight={600} marginRight={1}>
-                            {content.title}:
-                        </Typography>
-                        <Typography component={"span"} textAlign={"justify"}>
-                            {content.content}
-                        </Typography>
-                    </Box>
-                ))}
+                <Box>
+                    <Typography component={"span"} fontWeight={600} marginRight={1}>
+                        Địa điểm du lịch:
+                    </Typography>
+                    <Typography component={"span"} textAlign={"justify"}>
+                        {blog.address && blog.address}
+                    </Typography>
+                </Box>
+                <Box>
+                    <Typography component={"span"} fontWeight={600} marginRight={1}>
+                        Quốc gia:
+                    </Typography>
+                    <Typography component={"span"} textAlign={"justify"}>
+                        {blog.country && blog.country}
+                    </Typography>
+                </Box>
+                <Box>
+                    <Typography component={"span"} fontWeight={600} marginRight={1}>
+                        Thành phố:
+                    </Typography>
+                    <Typography component={"span"} textAlign={"justify"}>
+                        {blog.city && blog.city}
+                    </Typography>
+                </Box>
+                <Box>
+                    <Typography component={"span"} fontWeight={600} marginRight={1}>
+                        Nội dung nhận xét:
+                    </Typography>
+                    <Typography component={"span"} textAlign={"justify"}>
+                        {blog.content && blog.content}
+                    </Typography>
+                </Box>
             </Stack>
             {/* show images */}
-            <ImageShow images={images} handleOpenSlide={handleOpenSlide} />
+            <ImageShow
+                images={blog.images ? blog.images : []}
+                handleOpenSlide={handleOpenSlide}
+            />
             {/* show reaction */}
             <Box paddingX={1} sx={{ color: "rgba(0, 0, 0, 0.7)" }}>
                 <Box
@@ -163,7 +202,7 @@ export default function Blog() {
             {/* show image slide when user click to an image of blog */}
             {openSLide && (
                 <ImageSlider
-                    images={images}
+                    images={blog.images ? blog.images : []}
                     imageIndex={imageIndex}
                     handleCloseSlide={handleCloseSlide}
                 />
