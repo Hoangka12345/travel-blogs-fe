@@ -11,5 +11,7 @@ export interface I_Blog {
         lastName: string,
         avatar: string
     }
-    createdAt: string
+    createdAt: string;
+    isSaved?: boolean;
+    author?: string;
 }

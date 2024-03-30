@@ -40,8 +40,6 @@ export default function HeaderLayout() {
     const { token } = useContext(AppContext);
     const { user } = useContext(UserContext);
 
-    console.log(user);
-
     const onClickLogin = () => router.push("/login");
 
     const onClickProfile = () => router.push(`/profile/${user._id}`);

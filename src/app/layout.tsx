@@ -7,6 +7,7 @@ import AppProvider from "../providers/app-provider";
 import AutoChangeToken from "@/components/auto-change-token.component";
 import UserProvider from "@/providers/user-provider";
 import BlogProvider from "@/providers/blog-provider";
+import { I_User } from "@/interfaces/user.interface";
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -18,11 +19,14 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    let userInfo;
     const cookieStore = cookies();
     const access_token = cookieStore.get("access_token")?.value;
     const refresh_token = cookieStore.get("refresh_token")?.value;
     const userCookie = cookieStore.get("user");
-    const userInfo = JSON.parse(userCookie?.value || "");
+    if (userCookie) {
+        userInfo = JSON.parse(userCookie?.value);
+    }
 
     return (
         <html lang="en">

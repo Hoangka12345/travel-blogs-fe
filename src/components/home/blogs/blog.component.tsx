@@ -45,7 +45,10 @@ export default function Blog({ blog }: { blog: I_Blog }) {
     const [likeNumber, setLikeNumber] = useState<number>(1);
     const [openSLide, setOpenSlide] = useState<boolean>(false);
     const [imageIndex, setImageIndex] = useState<number>(0);
-    const [isSaved, setIsSaved] = useState<boolean>(false);
+
+    const isSaved = useMemo(() => {
+        return blog.isSaved;
+    }, [blog.isSaved]);
 
     const timeAgo = useMemo(() => {
         const createdTime = new Date(blog.createdAt);
@@ -83,14 +86,16 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                         secondary={timeAgo}
                     />
                 </ListItem>
-                <Tooltip title={isSaved ? "đã lưu" : "lưu blog"}>
-                    <IconButton>
-                        {isSaved ? (
-                            <BookmarkAddedOutlinedIcon />
-                        ) : (
-                            <BookmarkAddOutlinedIcon />
-                        )}
-                    </IconButton>
+                <Tooltip title={!isSaved ? "lưu blog" : "đã lưu"}>
+                    <Box component={"span"}>
+                        <IconButton disabled={isSaved}>
+                            {isSaved ? (
+                                <BookmarkAddedOutlinedIcon />
+                            ) : (
+                                <BookmarkAddOutlinedIcon />
+                            )}
+                        </IconButton>
+                    </Box>
                 </Tooltip>
             </Box>
             {/* main content */}
