@@ -28,6 +28,16 @@ interface I_registerField {
     label: string;
 }
 
+interface IErrors {
+    [key: string]: string;
+    firstName: string;
+    lastName: string;
+    dateOfBirth: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+}
+
 const registerFields: I_registerField[] = [
     { name: "firstName", label: "First name", type: "text" },
     { name: "lastName", label: "Last name", type: "text" },
@@ -39,7 +49,7 @@ const registerFields: I_registerField[] = [
 
 export default function RegisterForm() {
     const router = useRouter();
-    const [errors, setErrors] = React.useState({
+    const [errors, setErrors] = React.useState<IErrors>({
         firstName: "",
         lastName: "",
         dateOfBirth: "",
@@ -61,10 +71,13 @@ export default function RegisterForm() {
         if (!validatedFields.success) {
             const zodErrors = validatedFields.error.flatten().fieldErrors;
             const fieldErrors = zodErrors[name as keyof typeof zodErrors];
-            setErrors({
-                ...errors,
-                [name]: fieldErrors && fieldErrors[0],
-            });
+            setErrors(
+                (prev) =>
+                    ({
+                        ...prev,
+                        [name]: fieldErrors && fieldErrors[0],
+                    } as IErrors)
+            );
         } else {
             setErrors({
                 ...errors,

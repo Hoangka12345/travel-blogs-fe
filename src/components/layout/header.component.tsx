@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useState } from "react";
-import { Avatar, Box, Button, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, Stack, TextField, Typography } from "@mui/material";
 import { styled, alpha, createTheme } from "@mui/material/styles";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
@@ -92,9 +92,10 @@ export default function HeaderLayout() {
                         </Typography>
                     </>
                 ) : (
-                    <>
+                    <Stack direction={"row"} spacing={2}>
                         <Button
-                            size="large"
+                            size="medium"
+                            variant="outlined"
                             sx={{
                                 display: "flex",
                                 alignItems: "center",
@@ -103,10 +104,25 @@ export default function HeaderLayout() {
                             }}
                             onClick={onClickLogin}
                         >
-                            <LoginIcon />
+                            {/* <LoginIcon /> */}
                             Đăng nhập
                         </Button>
-                    </>
+
+                        <Button
+                            size="medium"
+                            variant="outlined"
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                                fontWeight: 600,
+                            }}
+                            onClick={() => router.push("/register")}
+                        >
+                            {/* <LoginIcon /> */}
+                            Đăng Ký
+                        </Button>
+                    </Stack>
                 )}
             </Box>
         </Box>
