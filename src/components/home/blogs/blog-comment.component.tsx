@@ -37,12 +37,16 @@ export default function BlogComment({ blog }: { blog: I_Blog }) {
     };
 
     useEffect(() => {
-        setListComment(blog.comments);
+        setListComment(blog?.comments);
 
         socket.on("comment", (comment) => {
-            const newListComments = comment.comments.reverse();
+            const comments = comment?.comments.reverse();
+            const newListComments = comments.map((item: any) => ({
+                ...item,
+                user: `${item.user.lastName} ${item.user.firstName}`,
+            }));
             setListComment((prev) => {
-                if (blog._id === comment.blog) {
+                if (blog?._id === comment?.blog) {
                     return newListComments;
                 }
                 return prev;
@@ -52,7 +56,7 @@ export default function BlogComment({ blog }: { blog: I_Blog }) {
         return () => {
             socket.off("comment");
         };
-    }, []);
+    }, [blog?.comments, blog?._id]);
 
     return (
         <Stack sx={{ paddingY: 1 }} spacing={1}>

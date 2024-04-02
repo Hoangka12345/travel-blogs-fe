@@ -32,7 +32,7 @@ export default function AutoChangeToken() {
             })();
         }, 1000 * 60 * 10);
         return () => clearInterval(interval);
-    }, []);
+    }, [token.access_token, token.access_token, updateAccessToken]);
 
     return null;
 }

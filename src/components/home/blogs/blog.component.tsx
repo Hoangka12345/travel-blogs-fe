@@ -103,7 +103,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
         socket.on("comment", (comment) => {
             const newListComments = comment.comments.reverse();
             setCommentNumber((prev) => {
-                if (blog._id === comment.blog) {
+                if (blog?._id === comment.blog) {
                     return newListComments.length;
                 }
                 return prev;
@@ -113,7 +113,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
         return () => {
             socket.off("comment");
         };
-    }, []);
+    }, [blog?._id, blog.comments.length]);
 
     const isSaved = useMemo(() => {
         return blog.isSaved;
