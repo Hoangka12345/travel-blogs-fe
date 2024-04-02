@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import {
     Avatar,
     Box,
+    Button,
     Divider,
     IconButton,
     Link,
@@ -28,6 +29,17 @@ import ImageShow from "@/components/image-show.component";
 import { I_Blog } from "@/interfaces/blog.interface";
 import moment from "moment";
 import { useRouter } from "next/navigation";
+import addReactionAction from "@/actions/add-reaction.action";
+import { AppContext } from "@/providers/app-provider";
+import { toast } from "react-toastify";
+import { io } from "socket.io-client";
+import { UserContext } from "@/providers/user-provider";
+import removeReactionAction from "@/actions/remove-reaction.action";
+import { socket } from "@/socket";
+
+// const socket = io("http://localhost:5000", {
+//     transports: ["websocket"],
+// });
 
 const StackReaction = styled(Stack)(({ theme }) => ({
     padding: `${theme.spacing(0.8)} ${theme.spacing(4)}`,
@@ -41,10 +53,67 @@ const StackReaction = styled(Stack)(({ theme }) => ({
 export default function Blog({ blog }: { blog: I_Blog }) {
     const router = useRouter();
 
+    const { token } = useContext(AppContext);
+    const { user } = useContext(UserContext);
+
     const [isLike, setIsLike] = useState<boolean>(false);
-    const [likeNumber, setLikeNumber] = useState<number>(1);
+    const [likeNumber, setLikeNumber] = useState<number>(0);
+    const [commentNumber, setCommentNumber] = useState<number>(0);
     const [openSLide, setOpenSlide] = useState<boolean>(false);
     const [imageIndex, setImageIndex] = useState<number>(0);
+
+    useEffect(() => {
+        (async () => {
+            if (blog._id) {
+                const res = await fetch(`/api/count-reaction/${blog._id}`);
+                const data = await res.json();
+
+                if (data.statusCode === 200) {
+                    const checkUserIsLike = data.data.reaction.some((item: string) => {
+                        return String(item) === user._id;
+                    });
+                    if (checkUserIsLike) {
+                        setIsLike(true);
+                    }
+                    setLikeNumber(data.data.count);
+                }
+            }
+        })();
+
+        socket.on("reaction", (data) => {
+            const { blogId, reaction } = data;
+            console.log(reaction);
+
+            setLikeNumber((prev) => {
+                if (blogId === blog._id) {
+                    return reaction.count;
+                }
+                return prev;
+            });
+        });
+
+        return () => {
+            socket.off("reaction");
+        };
+    }, []);
+
+    useEffect(() => {
+        setCommentNumber(blog.comments.length);
+
+        socket.on("comment", (comment) => {
+            const newListComments = comment.comments.reverse();
+            setCommentNumber((prev) => {
+                if (blog._id === comment.blog) {
+                    return newListComments.length;
+                }
+                return prev;
+            });
+        });
+
+        return () => {
+            socket.off("comment");
+        };
+    }, []);
 
     const isSaved = useMemo(() => {
         return blog.isSaved;
@@ -64,6 +133,26 @@ export default function Blog({ blog }: { blog: I_Blog }) {
     const onClickProfile = () => {
         if (blog.user._id) {
             router.push(`/profile/${blog.user._id}`);
+        }
+    };
+
+    const handleReaction = async (formData: FormData) => {
+        if (!token.access_token) {
+            toast.error("bạn cần đăng nhập để like bài blog");
+        } else {
+            if (!isLike) {
+                const res = await addReactionAction(blog._id);
+
+                if (res.status) {
+                    setIsLike(true);
+                }
+            } else {
+                const res = await removeReactionAction(blog._id);
+
+                if (res.status) {
+                    setIsLike(false);
+                }
+            }
         }
     };
 
@@ -146,7 +235,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                     justifyContent={"space-between"}
                     paddingY={2}
                 >
-                    <Stack direction={"row"} spacing={0.5} sx={{ cursor: "pointer" }}>
+                    <Stack direction={"row"} spacing={0.5}>
                         {isLike ? (
                             <ThumbUpAltIcon color="primary" />
                         ) : (
@@ -163,7 +252,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                             "&:hover": { textDecoration: "underline" },
                         }}
                     >
-                        5 bình luận
+                        {commentNumber} bình luận
                     </Link>
                 </Box>
 
@@ -175,23 +264,16 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                     justifyContent={"space-evenly"}
                     paddingY={1}
                 >
-                    <StackReaction
-                        direction={"row"}
-                        spacing={1}
-                        onClick={() => {
-                            setIsLike(!isLike);
-                            !isLike
-                                ? setLikeNumber((prev) => prev + 1)
-                                : setLikeNumber((prev) => prev - 1);
-                        }}
-                    >
-                        {isLike ? (
-                            <ThumbUpAltIcon color="primary" />
-                        ) : (
-                            <ThumbUpOffAltIcon />
-                        )}
-                        <Typography>Thích</Typography>
-                    </StackReaction>
+                    <Box component={"form"} action={handleReaction}>
+                        <Button color="inherit" type="submit">
+                            {isLike ? (
+                                <ThumbUpAltIcon color="primary" />
+                            ) : (
+                                <ThumbUpOffAltIcon />
+                            )}
+                            <Typography ml={1}>Thích</Typography>
+                        </Button>
+                    </Box>
 
                     <StackReaction direction={"row"} spacing={1}>
                         <SmsIcon />
@@ -201,7 +283,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
 
                 <Divider />
 
-                <BlogComment />
+                <BlogComment blog={blog} />
             </Box>
 
             {/* show image slide when user click to an image of blog */}

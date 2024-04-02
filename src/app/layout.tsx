@@ -24,6 +24,7 @@ export default function RootLayout({
     const access_token = cookieStore.get("access_token")?.value;
     const refresh_token = cookieStore.get("refresh_token")?.value;
     const userCookie = cookieStore.get("user");
+
     if (userCookie) {
         userInfo = JSON.parse(userCookie?.value);
     }

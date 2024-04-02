@@ -1,3 +1,5 @@
+import { I_Comment } from "./comment.interface";
+
 export interface I_Blog {
     _id: string;
     address: string;
@@ -14,4 +16,5 @@ export interface I_Blog {
     createdAt: string;
     isSaved?: boolean;
     author?: string;
+    comments: I_Comment[]
 }

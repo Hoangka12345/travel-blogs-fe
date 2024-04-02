@@ -18,7 +18,12 @@ export default function BlogList() {
                 const data = await res.json();
 
                 if (data.statusCode === 200) {
-                    setBlogs(data.data);
+                    const newBlogs = data.data.map((item: I_Blog) => ({
+                        ...item,
+                        comments: item.comments.reverse(),
+                    }));
+
+                    setBlogs(newBlogs);
                 }
             } catch (error) {
                 console.log(error);
@@ -36,7 +41,10 @@ export default function BlogList() {
 
     return (
         <Stack spacing={2}>
-            {blogs[0] && blogs.map((blog) => <Blog key={blog._id} blog={blog} />)}
+            {blogs[0] &&
+                blogs.map((blog) => {
+                    return <Blog key={blog._id} blog={blog} />;
+                })}
         </Stack>
     );
 }

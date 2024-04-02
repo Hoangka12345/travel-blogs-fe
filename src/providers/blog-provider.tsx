@@ -1,15 +1,7 @@
 "use client";
 
+import { I_Blog } from "@/interfaces/blog.interface";
 import { ReactNode, createContext, useState } from "react";
-
-interface I_Blog {
-    _id: string;
-    address: string;
-    country: string;
-    city: string;
-    content: string;
-    images: string[];
-}
 
 const initialBlogs: I_Blog[] = [];
 
@@ -20,7 +12,7 @@ export const BlogContext = createContext({
 
 export default function BlogProvider({ children }: { children: ReactNode }) {
     const [blogs, setBlogs] = useState<I_Blog[]>(initialBlogs);
-    const updateBlogs = (newBlog: I_Blog[]) => setBlogs((prev) => [...prev, ...newBlog]);
+    const updateBlogs = (newBlog: I_Blog[]) => setBlogs(newBlog);
 
     return (
         <BlogContext.Provider value={{ blogs, updateBlogs }}>
