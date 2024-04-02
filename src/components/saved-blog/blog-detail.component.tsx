@@ -20,6 +20,7 @@ export default function BlogDetail({ id }: { id: string }) {
             avatar: "",
         },
         createdAt: "",
+        comments: [],
     });
 
     useEffect(() => {
