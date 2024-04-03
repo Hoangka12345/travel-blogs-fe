@@ -27,12 +27,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { AppContext } from "@/providers/app-provider";
 import { UserContext } from "@/providers/user-provider";
-// import { socket } from "@/socket";
-import { io } from "socket.io-client";
-
-const socket = io("http://localhost:5000", {
-    transports: ["websocket"],
-});
 
 export default function LoginForm() {
     const router = useRouter();
@@ -113,12 +107,6 @@ export default function LoginForm() {
                         });
                         updateUser(res.data.user);
                         router.push("/");
-
-                        socket.on("connect", () => {
-                            console.log("connect");
-
-                            // socket.emit("join-group");
-                        });
                     }
                 } catch (error) {
                     throw error;

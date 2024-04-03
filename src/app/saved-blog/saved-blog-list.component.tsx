@@ -1,5 +1,6 @@
 "use client";
 
+import { I_Blog } from "@/interfaces/blog.interface";
 import { I_SavedBlog } from "@/interfaces/saved-blog.interface";
 import { AppContext } from "@/providers/app-provider";
 import {
@@ -32,7 +33,7 @@ export default function SavedBlogList() {
     const pathname = usePathname();
     const router = useRouter();
 
-    const [savedBlog, setSavedBlog] = useState<I_SavedBlog>();
+    const [blogs, setBlogs] = useState<I_Blog[]>([]);
 
     useEffect(() => {
         (async () => {
@@ -42,8 +43,9 @@ export default function SavedBlogList() {
                     headers: { "Content-Type": "application/json" },
                 });
                 const data = await res.json();
+
                 if (data.statusCode === 200) {
-                    setSavedBlog(data.data);
+                    setBlogs(data.data.savedBlogs);
                 }
             } catch (error) {
                 throw error;
@@ -74,12 +76,12 @@ export default function SavedBlogList() {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {savedBlog?.blogs[0] &&
-                        savedBlog.blogs.map((blog, index) => {
+                    {blogs[0] &&
+                        blogs.map((blog, index) => {
                             return (
                                 <TableRow key={blog._id}>
                                     <TableCell>{index + 1}</TableCell>
-                                    <TableCell>{blog?.author}</TableCell>
+                                    <TableCell>{blog?.user.fullName}</TableCell>
                                     <TableCell>{blog?.address}</TableCell>
                                     <TableCell>
                                         {blog.createdAt &&

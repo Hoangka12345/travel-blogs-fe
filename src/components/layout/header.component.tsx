@@ -9,6 +9,9 @@ import LoginIcon from "@mui/icons-material/Login";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/providers/app-provider";
 import { UserContext } from "@/providers/user-provider";
+import getBlogBySearch from "@/actions/search.action";
+import { BlogContext } from "@/providers/blogs-provider";
+import getBlogBySearchWhenLogin from "@/actions/search-when-login.action";
 
 const Search = styled("div")(({ theme }) => ({
     position: "relative",
@@ -39,27 +42,49 @@ export default function HeaderLayout() {
     const router = useRouter();
     const { token } = useContext(AppContext);
     const { user } = useContext(UserContext);
+    const { updateBlogs } = useContext(BlogContext);
 
     const onClickLogin = () => router.push("/login");
 
     const onClickProfile = () => router.push(`/profile/${user._id}`);
 
+    const handleSearch = async (formData: FormData) => {
+        const search = String(formData.get("search"));
+        if (token.access_token) {
+            const res = await getBlogBySearchWhenLogin(search, 1);
+
+            if (res.status) {
+                updateBlogs(res.data);
+            }
+        } else {
+            const res = await getBlogBySearch(search, 1);
+            if (res.status) {
+                updateBlogs(res.data);
+            }
+        }
+    };
+
     return (
         <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-            <Search>
-                <SearchIconWrapper>
-                    <SearchIcon />
-                </SearchIconWrapper>
-                <TextField
-                    fullWidth
-                    sx={{
-                        "& .MuiInputBase-input": { padding: theme.spacing(1, 1, 1, 5) },
-                    }}
-                    size="small"
-                    placeholder="Search Blog…"
-                    inputProps={{ "aria-label": "search" }}
-                />
-            </Search>
+            <Box component={"form"} action={handleSearch}>
+                <Search>
+                    <SearchIconWrapper>
+                        <SearchIcon />
+                    </SearchIconWrapper>
+                    <TextField
+                        name="search"
+                        fullWidth
+                        sx={{
+                            "& .MuiInputBase-input": {
+                                padding: theme.spacing(1, 1, 1, 5),
+                            },
+                        }}
+                        size="small"
+                        placeholder="Tìm kiếm địa điểm du lịch…"
+                        inputProps={{ "aria-label": "search" }}
+                    />
+                </Search>
+            </Box>
 
             <Box
                 display={"flex"}
@@ -83,12 +108,7 @@ export default function HeaderLayout() {
                             onClick={onClickProfile}
                             sx={{ cursor: "pointer" }}
                         >
-                            <Typography component={"span"}>
-                                {user.lastName && user.lastName}{" "}
-                            </Typography>
-                            <Typography component={"span"}>
-                                {user.firstName && user.firstName}
-                            </Typography>
+                            <Typography component={"span"}>{user?.fullName}</Typography>
                         </Typography>
                     </>
                 ) : (

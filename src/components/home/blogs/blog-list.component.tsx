@@ -2,28 +2,21 @@
 
 import { Stack } from "@mui/material";
 import Blog from "./blog.component";
-import { useContext, useEffect, useState } from "react";
-import { I_Blog } from "@/interfaces/blog.interface";
+import { useContext, useEffect } from "react";
 import { AppContext } from "@/providers/app-provider";
+import { BlogContext } from "@/providers/blogs-provider";
 
 export default function BlogList() {
     const { token } = useContext(AppContext);
-
-    const [blogs, setBlogs] = useState<I_Blog[]>([]);
+    const { blogs, updateBlogs } = useContext(BlogContext);
 
     useEffect(() => {
         const fetchApi = async (api: string) => {
             try {
                 const res = await fetch(api);
                 const data = await res.json();
-
                 if (data.statusCode === 200) {
-                    const newBlogs = data.data.map((item: I_Blog) => ({
-                        ...item,
-                        comments: item.comments.reverse(),
-                    }));
-
-                    setBlogs(newBlogs);
+                    updateBlogs(data.data);
                 }
             } catch (error) {
                 console.log(error);

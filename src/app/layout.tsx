@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import AppProvider from "../providers/app-provider";
 import AutoChangeToken from "@/components/auto-change-token.component";
 import UserProvider from "@/providers/user-provider";
-import BlogProvider from "@/providers/blog-provider";
+import BlogProvider from "@/providers/blogs-provider";
 import { I_User } from "@/interfaces/user.interface";
 
 export const metadata: Metadata = {

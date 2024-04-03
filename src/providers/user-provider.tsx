@@ -4,15 +4,13 @@ import { ReactNode, createContext, useState } from "react";
 
 interface I_User {
     _id: string;
-    firstName: string;
-    lastName: string;
+    fullName: string;
     avatar: string;
 }
 
 const initialUser: I_User = {
     _id: "",
-    firstName: "",
-    lastName: "",
+    fullName: "",
     avatar: "",
 };
 

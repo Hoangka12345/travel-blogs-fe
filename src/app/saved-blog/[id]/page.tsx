@@ -1,4 +1,4 @@
-import BlogDetail from "@/components/saved-blog/blog-detail.component";
+import BlogDetail from "@/app/saved-blog/[id]/blog-detail.component";
 import { Container } from "@mui/material";
 
 export default async function BlogDetailPage({ params }: { params: { id: string } }) {

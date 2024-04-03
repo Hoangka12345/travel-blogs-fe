@@ -8,7 +8,7 @@ export default async function removeReactionAction(blogId: string): Promise<I_Re
     const access_token = cookieStore.get('access_token')
 
     try {
-        const resPromise = await fetch(`${process.env.URL_API}/reaction/remove`, {
+        const resPromise = await fetch(`${process.env.URL_API}/blog/remove-reaction/${blogId}`, {
             method: "PUT",
             headers: {
                 'Authorization': `Bearer ${access_token?.value}`,

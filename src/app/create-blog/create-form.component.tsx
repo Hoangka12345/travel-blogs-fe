@@ -11,14 +11,15 @@ import {
     Typography,
     styled,
 } from "@mui/material";
-import { useState } from "react";
-import ImageSlider from "../images-slide.component";
-import ImageShow from "../image-show.component";
+import { useContext, useState } from "react";
+import ImageSlider from "../../components/images-slide.component";
+import ImageShow from "../../components/image-show.component";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { createBlogSchema } from "@/validations/create-blog.zod";
 import createBlogAction from "@/actions/create-blog.action";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { UserContext } from "@/providers/user-provider";
 
 const TextArea = styled(TextareaAutosize)(
     ({ error }: { error: boolean | undefined }) => ({
@@ -129,7 +130,6 @@ export default function CreateForm() {
             });
         } else {
             try {
-                formData.append("user", "6603f3347586cf97678ca0ba");
                 const res = await createBlogAction(formData);
                 if (!res.status) {
                     toast.error("Không thể tạo blog!");

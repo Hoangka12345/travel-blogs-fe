@@ -1,19 +1,27 @@
 "use server"
 
 import { I_Response } from "@/interfaces/response.interface"
+import { cookies } from "next/headers"
 
-export default async function createBlogAction(data: FormData): Promise<I_Response<any>> {
+export default async function createBlogAction(formData: FormData): Promise<I_Response<any>> {
+    const cookieStore = cookies()
+    const access_token = cookieStore.get('access_token')
+
     try {
-        const resPromise = await fetch(`${process.env.URL_API}/blog`, {
+        const res = await fetch(`${process.env.URL_API}/blog`, {
             method: "POST",
-            body: data
+            headers: {
+                'Authorization': `Bearer ${access_token?.value}`
+            },
+            body: formData
         })
-        const res = await resPromise.json()
+        const data = await res.json()
 
-        if (res.statusCode === 200) {
+
+        if (data.statusCode === 200) {
             return { status: true }
         }
-        return { status: false, message: res.message }
+        return { status: false, message: data.message }
     } catch (error) {
         throw error
     }

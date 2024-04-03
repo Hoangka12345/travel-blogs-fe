@@ -4,7 +4,7 @@ export async function GET(request: Request) {
     const cookieStore = cookies()
     const access_token = cookieStore.get('access_token')
 
-    const res = await fetch(`${process.env.URL_API}/saved-blog`, {
+    const res = await fetch(`${process.env.URL_API}/user/get-saved-blog`, {
         method: "GET",
         headers: {
             'Authorization': `Bearer ${access_token?.value}`,

@@ -32,10 +32,11 @@ import { useRouter } from "next/navigation";
 import addReactionAction from "@/actions/add-reaction.action";
 import { AppContext } from "@/providers/app-provider";
 import { toast } from "react-toastify";
-import { io } from "socket.io-client";
-import { UserContext } from "@/providers/user-provider";
 import removeReactionAction from "@/actions/remove-reaction.action";
-import { socket } from "@/socket";
+import { I_Comment } from "@/interfaces/comment.interface";
+import saveBlogAction from "@/actions/saved-blogs/save-blog.action";
+import removeBlogAction from "@/actions/saved-blogs/remove-blog.action";
+// import { socket } from "@/socket";
 
 // const socket = io("http://localhost:5000", {
 //     transports: ["websocket"],
@@ -54,71 +55,49 @@ export default function Blog({ blog }: { blog: I_Blog }) {
     const router = useRouter();
 
     const { token } = useContext(AppContext);
-    const { user } = useContext(UserContext);
 
+    const [isSaved, setIsSaved] = useState<boolean>(false);
     const [isLike, setIsLike] = useState<boolean>(false);
     const [likeNumber, setLikeNumber] = useState<number>(0);
     const [commentNumber, setCommentNumber] = useState<number>(0);
+    const [commentList, setCommentList] = useState<I_Comment[]>([]);
     const [openSLide, setOpenSlide] = useState<boolean>(false);
     const [imageIndex, setImageIndex] = useState<number>(0);
 
     useEffect(() => {
         (async () => {
             if (blog._id) {
-                const res = await fetch(`/api/count-reaction/${blog._id}`);
+                const res = await fetch(`/api/get-comments-reactions/${blog._id}`);
                 const data = await res.json();
 
                 if (data.statusCode === 200) {
-                    const checkUserIsLike = data.data.reaction.some((item: string) => {
-                        return String(item) === user._id;
-                    });
-                    if (checkUserIsLike) {
-                        setIsLike(true);
-                    }
-                    setLikeNumber(data.data.count);
+                    setLikeNumber(data.data.reactionNumber);
+                    setCommentNumber(data.data.commentNumber);
+                    setCommentList(data.data.comments);
+                    setIsLike(() => (blog.isLike ? true : false));
+                    setIsSaved(() => (blog.isSaved ? true : false));
                 }
             }
         })();
 
-        socket.on("reaction", (data) => {
-            const { blogId, reaction } = data;
-            console.log(reaction);
+        // socket.on("reaction", (data) => {
+        //     const { blogId, reaction } = data;
+        //     console.log(reaction);
 
-            setLikeNumber((prev) => {
-                if (blogId === blog._id) {
-                    return reaction.count;
-                }
-                return prev;
-            });
-        });
+        //     setLikeNumber((prev) => {
+        //         if (blogId === blog._id) {
+        //             return reaction.count;
+        //         }
+        //         return prev;
+        //     });
+        // });
 
-        return () => {
-            socket.off("reaction");
-        };
-    }, []);
+        // return () => {
+        //     socket.off("reaction");
+        // };
+    }, [blog]);
 
-    useEffect(() => {
-        setCommentNumber(blog.comments.length);
-
-        socket.on("comment", (comment) => {
-            const newListComments = comment.comments.reverse();
-            setCommentNumber((prev) => {
-                if (blog?._id === comment.blog) {
-                    return newListComments.length;
-                }
-                return prev;
-            });
-        });
-
-        return () => {
-            socket.off("comment");
-        };
-    }, [blog?._id, blog.comments.length]);
-
-    const isSaved = useMemo(() => {
-        return blog.isSaved;
-    }, [blog.isSaved]);
-
+    // convert date to time ago using moment
     const timeAgo = useMemo(() => {
         const createdTime = new Date(blog.createdAt);
         return moment(createdTime).fromNow();
@@ -130,27 +109,41 @@ export default function Blog({ blog }: { blog: I_Blog }) {
         setImageIndex(index);
     };
 
+    // navigate to profile page
     const onClickProfile = () => {
         if (blog.user._id) {
             router.push(`/profile/${blog.user._id}`);
         }
     };
 
+    // handle click to like button
     const handleReaction = async (formData: FormData) => {
         if (!token.access_token) {
             toast.error("bạn cần đăng nhập để like bài blog");
         } else {
             if (!isLike) {
                 const res = await addReactionAction(blog._id);
-
                 if (res.status) {
                     setIsLike(true);
                 }
             } else {
                 const res = await removeReactionAction(blog._id);
-
                 if (res.status) {
                     setIsLike(false);
+                }
+            }
+        }
+    };
+
+    // handle click to saved blog icon
+    const handleSaveBlog = async () => {
+        if (!token.access_token) {
+            toast.error("bạn cần đăng nhập để lưu bài blog");
+        } else {
+            if (!isSaved) {
+                const res = await saveBlogAction(blog._id);
+                if (res.status) {
+                    setIsSaved(true);
                 }
             }
         }
@@ -167,17 +160,13 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                     <ListItemText
                         onClick={onClickProfile}
                         sx={{ cursor: "pointer" }}
-                        primary={
-                            blog.user.firstName &&
-                            blog.user.lastName &&
-                            `${blog.user.lastName} ${blog.user.firstName}`
-                        }
+                        primary={blog?.user.fullName}
                         secondary={timeAgo}
                     />
                 </ListItem>
                 <Tooltip title={!isSaved ? "lưu blog" : "đã lưu"}>
                     <Box component={"span"}>
-                        <IconButton disabled={isSaved}>
+                        <IconButton disabled={isSaved} onClick={handleSaveBlog}>
                             {isSaved ? (
                                 <BookmarkAddedOutlinedIcon />
                             ) : (
@@ -283,7 +272,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
 
                 <Divider />
 
-                <BlogComment blog={blog} />
+                <BlogComment blogId={blog._id} commentList={commentList} />
             </Box>
 
             {/* show image slide when user click to an image of blog */}

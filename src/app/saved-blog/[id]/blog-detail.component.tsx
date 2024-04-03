@@ -15,12 +15,10 @@ export default function BlogDetail({ id }: { id: string }) {
         images: [],
         user: {
             _id: "",
-            firstName: "",
-            lastName: "",
+            fullName: "",
             avatar: "",
         },
         createdAt: "",
-        comments: [],
     });
 
     useEffect(() => {

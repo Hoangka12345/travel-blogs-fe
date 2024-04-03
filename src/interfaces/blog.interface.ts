@@ -9,12 +9,10 @@ export interface I_Blog {
     images: string[];
     user: {
         _id: string,
-        firstName: string,
-        lastName: string,
+        fullName: string,
         avatar: string
     }
     createdAt: string;
     isSaved?: boolean;
-    author?: string;
-    comments: I_Comment[]
+    isLike?: boolean;
 }

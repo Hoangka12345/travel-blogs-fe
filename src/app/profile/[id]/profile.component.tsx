@@ -4,10 +4,12 @@ import { Avatar, Box, Paper, Stack, Typography } from "@mui/material";
 import { I_User } from "@/interfaces/user.interface";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import Blog from "../home/blogs/blog.component";
+import Blog from "../../../components/home/blogs/blog.component";
+import { I_Blog } from "@/interfaces/blog.interface";
 
 export default function Profile({ id }: { id: string }) {
     const [user, setUser] = useState<I_User>();
+    const [blogs, setBlogs] = useState<I_Blog[]>([]);
 
     useEffect(() => {
         (async () => {
@@ -16,8 +18,10 @@ export default function Profile({ id }: { id: string }) {
                 headers: { "Content-Type": "application/json" },
             });
             const data = await res.json();
+
             if (data.statusCode === 200) {
-                setUser(data.data);
+                setUser(data.data.user);
+                setBlogs(data.data.blogs);
             }
         })();
     }, []);
@@ -88,8 +92,7 @@ export default function Profile({ id }: { id: string }) {
             </Paper>
 
             <Stack spacing={2}>
-                {user?.blogs &&
-                    user.blogs.map((blog) => <Blog key={blog._id} blog={blog} />)}
+                {blogs[0] && blogs.map((blog) => <Blog key={blog._id} blog={blog} />)}
             </Stack>
         </Box>
     );

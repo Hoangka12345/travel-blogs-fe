@@ -1,6 +1,5 @@
-import SavedBlogList from "@/components/saved-blog/saved-blog-list.component";
+import SavedBlogList from "@/app/saved-blog/saved-blog-list.component";
 import { Paper } from "@mui/material";
-import { cookies } from "next/headers";
 
 export default async function SavedBlogPage() {
     return (
