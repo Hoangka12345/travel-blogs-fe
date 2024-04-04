@@ -16,7 +16,7 @@ import ImageSlider from "../../components/images-slide.component";
 import ImageShow from "../../components/image-show.component";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { createBlogSchema } from "@/validations/create-blog.zod";
-import createBlogAction from "@/actions/create-blog.action";
+import createBlogAction from "@/actions/blog/create-blog.action";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { UserContext } from "@/providers/user-provider";
@@ -63,6 +63,7 @@ export default function CreateForm() {
     const [imageSrc, setImageSrc] = useState<string[]>([]);
     const [openSLide, setOpenSlide] = useState<boolean>(false);
     const [imageIndex, setImageIndex] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const handleCloseSlide = () => setOpenSlide(false);
     const handleOpenSlide = (index: number) => {
@@ -116,7 +117,9 @@ export default function CreateForm() {
         }
     };
 
-    const handleCreateBlog = async (formData: FormData) => {
+    const handleCreateBlog = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
         const data = {
             address: formData.get("address"),
             content: formData.get("content"),
@@ -130,10 +133,13 @@ export default function CreateForm() {
             });
         } else {
             try {
+                setLoading(true);
                 const res = await createBlogAction(formData);
                 if (!res.status) {
+                    setLoading(false);
                     toast.error("Không thể tạo blog!");
                 } else {
+                    setLoading(false);
                     router.push("/");
                     toast.success("Blog của bạn đã được tạo!");
                 }
@@ -143,7 +149,7 @@ export default function CreateForm() {
 
     return (
         <>
-            <Stack spacing={2} component={"form"} action={handleCreateBlog}>
+            <Stack spacing={2} component={"form"} onSubmit={handleCreateBlog}>
                 {contents.map((content) => (
                     <Box key={content.label} display={"flex"} alignItems={"center"}>
                         <Typography sx={{ width: "30%" }}>{content.label}:</Typography>
@@ -218,8 +224,8 @@ export default function CreateForm() {
                     <ImageShow images={imageSrc} handleOpenSlide={handleOpenSlide} />
                 )}
 
-                <Button fullWidth type="submit" variant="contained">
-                    Tạo Blog
+                <Button fullWidth type="submit" variant="contained" disabled={loading}>
+                    {loading ? "đang tạo blog..." : "Tạo Blog"}
                 </Button>
             </Stack>
             {openSLide && (

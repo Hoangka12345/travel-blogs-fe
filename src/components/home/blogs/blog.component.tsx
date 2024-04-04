@@ -29,13 +29,16 @@ import ImageShow from "@/components/image-show.component";
 import { I_Blog } from "@/interfaces/blog.interface";
 import moment from "moment";
 import { useRouter } from "next/navigation";
-import addReactionAction from "@/actions/add-reaction.action";
+import addReactionAction from "@/actions/reaction/add-reaction.action";
 import { AppContext } from "@/providers/app-provider";
 import { toast } from "react-toastify";
-import removeReactionAction from "@/actions/remove-reaction.action";
+import removeReactionAction from "@/actions/reaction/remove-reaction.action";
 import { I_Comment } from "@/interfaces/comment.interface";
 import saveBlogAction from "@/actions/saved-blogs/save-blog.action";
 import removeBlogAction from "@/actions/saved-blogs/remove-blog.action";
+import { socket } from "@/socket";
+import addNotificationAction from "@/actions/notification/add-notification.action";
+import { UserContext } from "@/providers/user-provider";
 // import { socket } from "@/socket";
 
 // const socket = io("http://localhost:5000", {
@@ -55,6 +58,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
     const router = useRouter();
 
     const { token } = useContext(AppContext);
+    const { user } = useContext(UserContext);
 
     const [isSaved, setIsSaved] = useState<boolean>(false);
     const [isLike, setIsLike] = useState<boolean>(false);
@@ -63,6 +67,22 @@ export default function Blog({ blog }: { blog: I_Blog }) {
     const [commentList, setCommentList] = useState<I_Comment[]>([]);
     const [openSLide, setOpenSlide] = useState<boolean>(false);
     const [imageIndex, setImageIndex] = useState<number>(0);
+
+    useEffect(() => {
+        socket.on("comment", (comment) => {
+            const newCommentNumber = comment.length;
+            setCommentNumber(newCommentNumber as number);
+        });
+
+        socket.on("reaction", (totalReactions) => {
+            setLikeNumber(totalReactions);
+        });
+
+        return () => {
+            socket.off("comment");
+            socket.off("reaction");
+        };
+    }, []);
 
     useEffect(() => {
         (async () => {
@@ -79,22 +99,6 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                 }
             }
         })();
-
-        // socket.on("reaction", (data) => {
-        //     const { blogId, reaction } = data;
-        //     console.log(reaction);
-
-        //     setLikeNumber((prev) => {
-        //         if (blogId === blog._id) {
-        //             return reaction.count;
-        //         }
-        //         return prev;
-        //     });
-        // });
-
-        // return () => {
-        //     socket.off("reaction");
-        // };
     }, [blog]);
 
     // convert date to time ago using moment
@@ -124,6 +128,10 @@ export default function Blog({ blog }: { blog: I_Blog }) {
             if (!isLike) {
                 const res = await addReactionAction(blog._id);
                 if (res.status) {
+                    await addNotificationAction(
+                        `${user.fullName} đã like bài viết của bạn!`,
+                        blog?._id
+                    );
                     setIsLike(true);
                 }
             } else {

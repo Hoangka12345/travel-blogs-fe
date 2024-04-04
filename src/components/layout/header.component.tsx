@@ -1,17 +1,25 @@
 "use client";
 
-import { useContext, useState } from "react";
-import { Avatar, Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { useContext } from "react";
+import {
+    Avatar,
+    Box,
+    Button,
+    IconButton,
+    Stack,
+    TextField,
+    Typography,
+} from "@mui/material";
 import { styled, alpha, createTheme } from "@mui/material/styles";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
-import LoginIcon from "@mui/icons-material/Login";
 import { useRouter } from "next/navigation";
 import { AppContext } from "@/providers/app-provider";
 import { UserContext } from "@/providers/user-provider";
-import getBlogBySearch from "@/actions/search.action";
+import getBlogBySearch from "@/actions/blog/search.action";
 import { BlogContext } from "@/providers/blogs-provider";
-import getBlogBySearchWhenLogin from "@/actions/search-when-login.action";
+import getBlogBySearchWhenLogin from "@/actions/blog/search-when-login.action";
+import Notification from "./notification.component";
 
 const Search = styled("div")(({ theme }) => ({
     position: "relative",
@@ -95,7 +103,7 @@ export default function HeaderLayout() {
             >
                 {token.access_token ? (
                     <>
-                        <NotificationsIcon />
+                        <Notification />
                         <Avatar
                             alt="avatar"
                             src={user.avatar ? user.avatar : "/imgs/img1.jpg"}

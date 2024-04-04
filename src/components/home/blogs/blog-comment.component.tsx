@@ -12,13 +12,15 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import { useContext, useEffect, useState } from "react";
 import { I_Blog } from "@/interfaces/blog.interface";
-import addCommentAction from "@/actions/add-comment.action";
+import addCommentAction from "@/actions/comment/add-comment.action";
 // import { socket } from "@/socket";
 import { io } from "socket.io-client";
 import { I_Comment } from "@/interfaces/comment.interface";
 import moment from "moment";
 import { AppContext } from "@/providers/app-provider";
 import { UserContext } from "@/providers/user-provider";
+import { socket } from "@/socket";
+import addNotificationAction from "@/actions/notification/add-notification.action";
 
 // const socket = io("http://localhost:5000", {
 //     transports: ["websocket"],
@@ -40,34 +42,27 @@ export default function BlogComment({
     const handleComment = async (formData: FormData) => {
         const content = String(formData.get("comment"));
         await addCommentAction(blogId, content);
+        await addNotificationAction(
+            `${user.fullName} đã comment bài blog của bạn`,
+            blogId
+        );
         setComment("");
     };
 
     useEffect(() => {
-        setComments(commentList);
+        setComments(commentList.reverse());
     }, [commentList]);
 
-    // useEffect(() => {
-    //     setListComment(blog?.comments);
+    useEffect(() => {
+        socket.on("comment", (comment) => {
+            const newComments = comment.reverse();
+            setComments(newComments as I_Comment[]);
+        });
 
-    //     socket.on("comment", (comment) => {
-    //         const comments = comment?.comments.reverse();
-    //         const newListComments = comments.map((item: any) => ({
-    //             ...item,
-    //             user: `${item.user.lastName} ${item.user.firstName}`,
-    //         }));
-    //         setListComment((prev) => {
-    //             if (blog?._id === comment?.blog) {
-    //                 return newListComments;
-    //             }
-    //             return prev;
-    //         });
-    //     });
-
-    //     return () => {
-    //         socket.off("comment");
-    //     };
-    // }, [blog?.comments, blog?._id]);
+        return () => {
+            socket.off("comment");
+        };
+    }, []);
 
     return (
         <Stack sx={{ paddingY: 1 }} spacing={1}>

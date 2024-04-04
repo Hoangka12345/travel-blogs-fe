@@ -7,7 +7,8 @@ export default async function loginAction(data: any): Promise<I_Response<any>> {
         const resPromise = await fetch(`${process.env.URL_API}/auth/login`, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            cache: "no-store"
         })
         const res = await resPromise.json()
         if (res.statusCode === 200) {
