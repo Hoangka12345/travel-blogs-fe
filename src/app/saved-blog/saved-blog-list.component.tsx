@@ -1,5 +1,6 @@
 "use client";
 
+import removeBlogAction from "@/actions/saved-blogs/remove-blog.action";
 import { I_Blog } from "@/interfaces/blog.interface";
 import { I_SavedBlog } from "@/interfaces/saved-blog.interface";
 import { AppContext } from "@/providers/app-provider";
@@ -15,8 +16,10 @@ import {
     styled,
 } from "@mui/material";
 import moment from "moment";
+import { revalidateTag } from "next/cache";
 import { usePathname, useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const HeaderTitle = styled(Typography)(({ theme }) => ({
     fontWeight: 600,
@@ -52,6 +55,17 @@ export default function SavedBlogList() {
             }
         })();
     }, []);
+
+    const onClickDelete = async (blogId: string) => {
+        const res = await removeBlogAction(blogId);
+        if (res.status) {
+            const newBlogs = blogs.filter((blog) => blog._id !== blogId);
+            setBlogs(newBlogs);
+            toast.success("xóa blog từ bộ sưu tập thành công!");
+        } else {
+            toast.error("không thể xóa blog!");
+        }
+    };
 
     return (
         <>
@@ -94,9 +108,7 @@ export default function SavedBlogList() {
                                         <Button
                                             variant="contained"
                                             color="error"
-                                            // onClick={() =>
-                                            //     onClickDelete(student?._id, student?.name)
-                                            // }
+                                            onClick={() => onClickDelete(blog?._id)}
                                         >
                                             Xóa Blog
                                         </Button>
@@ -105,7 +117,7 @@ export default function SavedBlogList() {
                                             variant="contained"
                                             color="primary"
                                             onClick={() =>
-                                                router.push(`${pathname}/${blog?._id}`)
+                                                router.push(`/blog/${blog?._id}`)
                                             }
                                         >
                                             Thông tin chi tiết

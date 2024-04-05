@@ -10,7 +10,7 @@ export async function GET(request: Request) {
             'Authorization': `Bearer ${access_token?.value}`,
             "Content-Type": "application/json",
         },
-        cache: "no-store"
+        next: { tags: ["saved-blog"] }
     })
 
     const data = await res.json()

@@ -98,7 +98,7 @@ export default function HeaderLayout() {
                 display={"flex"}
                 alignItems={"center"}
                 justifyContent={"end"}
-                gap={1.5}
+                gap={2}
                 width={"50%"}
             >
                 {token.access_token ? (

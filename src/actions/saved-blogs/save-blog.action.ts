@@ -1,6 +1,7 @@
 "use server"
 
 import { I_Response } from "@/interfaces/response.interface"
+import { revalidateTag } from "next/cache"
 import { cookies } from "next/headers"
 
 export default async function saveBlogAction(blogId: string): Promise<I_Response<any>> {
@@ -19,10 +20,10 @@ export default async function saveBlogAction(blogId: string): Promise<I_Response
             body: JSON.stringify({ blogId })
         })
         const res = await resPromise.json()
-        console.log(res);
-
 
         if (res.statusCode === 200) {
+            revalidateTag("saved-blog")
+            revalidateTag("login-blog")
             return { status: true }
         }
         return { status: false, message: res.message }

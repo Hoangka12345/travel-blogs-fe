@@ -27,12 +27,15 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { AppContext } from "@/providers/app-provider";
 import { UserContext } from "@/providers/user-provider";
+import { io } from "socket.io-client";
+import { WebSocketContext } from "@/providers/socket.provider";
 
 export default function LoginForm() {
     const router = useRouter();
 
     const { updateAccessToken } = useContext(AppContext);
     const { updateUser } = useContext(UserContext);
+    // const { socket } = useContext(WebSocketContext);
 
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({
@@ -106,6 +109,13 @@ export default function LoginForm() {
                             refresh_token: res.data.refresh_token,
                         });
                         updateUser(res.data.user);
+                        // if (socket) {
+                        //     socket.connect();
+                        //     socket.on("connection", (id) => {
+                        //         console.log(id);
+                        //     });
+                        //     socket.emit("connection", res.data.user._id);
+                        // }
                         router.push("/");
                     }
                 } catch (error) {

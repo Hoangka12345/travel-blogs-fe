@@ -8,6 +8,7 @@ import AutoChangeToken from "@/components/auto-change-token.component";
 import UserProvider from "@/providers/user-provider";
 import BlogProvider from "@/providers/blogs-provider";
 import { I_User } from "@/interfaces/user.interface";
+import WebSocketProvider from "@/providers/socket.provider";
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -33,14 +34,16 @@ export default function RootLayout({
         <html lang="en">
             <body>
                 <AppProvider access_token={access_token} refresh_token={refresh_token}>
-                    <UserProvider userInfo={userInfo}>
-                        <BlogProvider>
-                            <LayoutProvider>
-                                {children}
-                                <AutoChangeToken />
-                            </LayoutProvider>
-                        </BlogProvider>
-                    </UserProvider>
+                    <WebSocketProvider>
+                        <UserProvider userInfo={userInfo}>
+                            <BlogProvider>
+                                <LayoutProvider>
+                                    {children}
+                                    <AutoChangeToken />
+                                </LayoutProvider>
+                            </BlogProvider>
+                        </UserProvider>
+                    </WebSocketProvider>
                 </AppProvider>
                 <ToastContainer />
             </body>

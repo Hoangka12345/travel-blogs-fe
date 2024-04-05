@@ -10,31 +10,27 @@ import {
     Typography,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import { useContext, useEffect, useState } from "react";
-import { I_Blog } from "@/interfaces/blog.interface";
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import addCommentAction from "@/actions/comment/add-comment.action";
-// import { socket } from "@/socket";
-import { io } from "socket.io-client";
 import { I_Comment } from "@/interfaces/comment.interface";
 import moment from "moment";
 import { AppContext } from "@/providers/app-provider";
 import { UserContext } from "@/providers/user-provider";
-import { socket } from "@/socket";
 import addNotificationAction from "@/actions/notification/add-notification.action";
-
-// const socket = io("http://localhost:5000", {
-//     transports: ["websocket"],
-// });
+import { WebSocketContext } from "@/providers/socket.provider";
 
 export default function BlogComment({
     blogId,
     commentList,
+    setCommentNumber,
 }: {
     blogId: string;
     commentList: I_Comment[];
+    setCommentNumber: Dispatch<SetStateAction<number>>;
 }) {
     const { token } = useContext(AppContext);
     const { user } = useContext(UserContext);
+    // const { socket } = useContext(WebSocketContext);
 
     const [comment, setComment] = useState<string>("");
     const [comments, setComments] = useState<I_Comment[]>([]);
@@ -43,26 +39,38 @@ export default function BlogComment({
         const content = String(formData.get("comment"));
         await addCommentAction(blogId, content);
         await addNotificationAction(
-            `${user.fullName} đã comment bài blog của bạn`,
+            `${user.fullName} đã comment bài blog của bạn!`,
             blogId
         );
         setComment("");
+        setComments((prev) => [
+            ...prev,
+            {
+                user: { _id: user._id, avatar: user.avatar, fullName: user.fullName },
+                _id: String(Math.random()),
+                content: comment,
+                createdAt: String(new Date()),
+            },
+        ]);
+        setCommentNumber((prev) => prev + 1);
     };
 
     useEffect(() => {
         setComments(commentList.reverse());
     }, [commentList]);
 
-    useEffect(() => {
-        socket.on("comment", (comment) => {
-            const newComments = comment.reverse();
-            setComments(newComments as I_Comment[]);
-        });
+    // useEffect(() => {
+    //     if (socket) {
+    //         socket.on("comment", (comment) => {
+    //             const newComments = comment.reverse() as I_Comment[];
+    //             setComments(newComments);
+    //         });
 
-        return () => {
-            socket.off("comment");
-        };
-    }, []);
+    //         return () => {
+    //             socket.off("comment");
+    //         };
+    //     }
+    // }, []);
 
     return (
         <Stack sx={{ paddingY: 1 }} spacing={1}>

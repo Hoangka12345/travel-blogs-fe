@@ -35,15 +35,9 @@ import { toast } from "react-toastify";
 import removeReactionAction from "@/actions/reaction/remove-reaction.action";
 import { I_Comment } from "@/interfaces/comment.interface";
 import saveBlogAction from "@/actions/saved-blogs/save-blog.action";
-import removeBlogAction from "@/actions/saved-blogs/remove-blog.action";
-import { socket } from "@/socket";
 import addNotificationAction from "@/actions/notification/add-notification.action";
 import { UserContext } from "@/providers/user-provider";
-// import { socket } from "@/socket";
-
-// const socket = io("http://localhost:5000", {
-//     transports: ["websocket"],
-// });
+import { WebSocketContext } from "@/providers/socket.provider";
 
 const StackReaction = styled(Stack)(({ theme }) => ({
     padding: `${theme.spacing(0.8)} ${theme.spacing(4)}`,
@@ -59,6 +53,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
 
     const { token } = useContext(AppContext);
     const { user } = useContext(UserContext);
+    // const { socket } = useContext(WebSocketContext);
 
     const [isSaved, setIsSaved] = useState<boolean>(false);
     const [isLike, setIsLike] = useState<boolean>(false);
@@ -68,21 +63,23 @@ export default function Blog({ blog }: { blog: I_Blog }) {
     const [openSLide, setOpenSlide] = useState<boolean>(false);
     const [imageIndex, setImageIndex] = useState<number>(0);
 
-    useEffect(() => {
-        socket.on("comment", (comment) => {
-            const newCommentNumber = comment.length;
-            setCommentNumber(newCommentNumber as number);
-        });
+    // useEffect(() => {
+    //     if (socket) {
+    //         socket.on("comment", (comment) => {
+    //             const newCommentNumber = comment.length;
+    //             setCommentNumber(newCommentNumber as number);
+    //         });
 
-        socket.on("reaction", (totalReactions) => {
-            setLikeNumber(totalReactions);
-        });
+    //         socket.on("reaction", (totalReactions) => {
+    //             setLikeNumber(totalReactions);
+    //         });
 
-        return () => {
-            socket.off("comment");
-            socket.off("reaction");
-        };
-    }, []);
+    //         return () => {
+    //             socket.off("comment");
+    //             socket.off("reaction");
+    //         };
+    //     }
+    // }, []);
 
     useEffect(() => {
         (async () => {
@@ -133,11 +130,13 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                         blog?._id
                     );
                     setIsLike(true);
+                    setLikeNumber((prev) => prev + 1);
                 }
             } else {
                 const res = await removeReactionAction(blog._id);
                 if (res.status) {
                     setIsLike(false);
+                    setLikeNumber((prev) => prev - 1);
                 }
             }
         }
@@ -280,7 +279,11 @@ export default function Blog({ blog }: { blog: I_Blog }) {
 
                 <Divider />
 
-                <BlogComment blogId={blog._id} commentList={commentList} />
+                <BlogComment
+                    blogId={blog._id}
+                    commentList={commentList}
+                    setCommentNumber={setCommentNumber}
+                />
             </Box>
 
             {/* show image slide when user click to an image of blog */}
