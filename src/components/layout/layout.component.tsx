@@ -6,8 +6,10 @@ import { Box, Container, CssBaseline, Grid, createTheme } from "@mui/material";
 import NavigationBar from "./navigation-bar.component";
 import HeaderLayout from "./header.component";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { useLocalStorage } from "../hooks/localstorage.hook";
+import { AppContext } from "@/providers/app-provider";
+import { UserContext } from "@/providers/user-provider";
 
 const defaultTheme = createTheme();
 
@@ -17,6 +19,23 @@ export default function LayoutProvider({
     children: React.ReactNode;
 }>) {
     const pathname = usePathname();
+    const { user } = useContext(AppContext);
+    const { updateUser } = useContext(UserContext);
+
+    useEffect(() => {
+        (async () => {
+            if (user) {
+                const res = await fetch("/api/get-user-info", {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                });
+                const data = await res.json();
+                if (data.statusCode === 200) {
+                    updateUser(data.data);
+                }
+            }
+        })();
+    }, [user]);
 
     if (pathname === "/login" || pathname === "/register") {
         return <Box>{children}</Box>;

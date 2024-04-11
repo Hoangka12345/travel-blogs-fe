@@ -11,6 +11,7 @@ import {
     Typography,
 } from "@mui/material";
 import moment from "moment";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface I_TopUser {
@@ -22,6 +23,8 @@ interface I_TopUser {
 }
 
 export default function TopContributor() {
+    const router = useRouter();
+
     const [topUsers, setTopUsers] = useState<I_TopUser[]>([]);
 
     useEffect(() => {
@@ -48,7 +51,7 @@ export default function TopContributor() {
                             borderRadius: 2,
                             "&:hover": { backgroundColor: "rgba(0,0,0,0.05)" },
                         }}
-                        onClick={() => console.log(user?._id)}
+                        onClick={() => router.push(`/profile/${user?._id}`)}
                     >
                         <ListItemAvatar>
                             <Avatar src={user?.avatar} />

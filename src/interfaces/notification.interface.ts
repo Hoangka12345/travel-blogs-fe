@@ -1,6 +1,6 @@
 export interface I_Notification {
     _id: string,
-    blog: string,
+    blogId: string,
     content: string,
     createdAt: string,
     sender: string,

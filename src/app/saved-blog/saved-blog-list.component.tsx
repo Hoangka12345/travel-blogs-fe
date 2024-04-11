@@ -1,9 +1,6 @@
 "use client";
 
 import removeBlogAction from "@/actions/saved-blogs/remove-blog.action";
-import { I_Blog } from "@/interfaces/blog.interface";
-import { I_SavedBlog } from "@/interfaces/saved-blog.interface";
-import { AppContext } from "@/providers/app-provider";
 import {
     Button,
     Table,
@@ -16,39 +13,42 @@ import {
     styled,
 } from "@mui/material";
 import moment from "moment";
-import { revalidateTag } from "next/cache";
 import { usePathname, useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 const HeaderTitle = styled(Typography)(({ theme }) => ({
     fontWeight: 600,
 }));
 
-const fakeData = [
-    { author: "John Doe", location: "Paris, France" },
-    { author: "Alice Smith", location: "Tokyo, Japan" },
-    { author: "Bob Johnson", location: "Rome, Italy" },
-    { author: "Emily Brown", location: "New York, USA" },
-];
+interface I_SavedBlog {
+    _id: string;
+    userId: {
+        fullName: string;
+    };
+    blogId: {
+        _id: string;
+        address: string;
+        createdAt: string;
+    };
+}
 
 export default function SavedBlogList() {
-    const pathname = usePathname();
     const router = useRouter();
 
-    const [blogs, setBlogs] = useState<I_Blog[]>([]);
+    const [savedBlogs, setSavedBlogs] = useState<I_SavedBlog[]>([]);
 
     useEffect(() => {
         (async () => {
             try {
-                const res = await fetch("/api/saved-blog", {
+                const res = await fetch("/api/get-saved-blog", {
                     method: "GET",
                     headers: { "Content-Type": "application/json" },
                 });
                 const data = await res.json();
 
                 if (data.statusCode === 200) {
-                    setBlogs(data.data.savedBlogs);
+                    setSavedBlogs(data.data);
                 }
             } catch (error) {
                 throw error;
@@ -56,11 +56,13 @@ export default function SavedBlogList() {
         })();
     }, []);
 
-    const onClickDelete = async (blogId: string) => {
-        const res = await removeBlogAction(blogId);
+    const onClickDelete = async (savedBlogId: string) => {
+        const res = await removeBlogAction(savedBlogId);
         if (res.status) {
-            const newBlogs = blogs.filter((blog) => blog._id !== blogId);
-            setBlogs(newBlogs);
+            const newSavedBlogs = savedBlogs.filter(
+                (savedBlog) => savedBlog._id !== savedBlogId
+            );
+            setSavedBlogs(newSavedBlogs);
             toast.success("xóa blog từ bộ sưu tập thành công!");
         } else {
             toast.error("không thể xóa blog!");
@@ -90,16 +92,18 @@ export default function SavedBlogList() {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {blogs[0] &&
-                        blogs.map((blog, index) => {
+                    {savedBlogs &&
+                        savedBlogs.map((savedBlog, index) => {
                             return (
-                                <TableRow key={blog._id}>
+                                <TableRow key={savedBlog?._id}>
                                     <TableCell>{index + 1}</TableCell>
-                                    <TableCell>{blog?.user.fullName}</TableCell>
-                                    <TableCell>{blog?.address}</TableCell>
+                                    <TableCell>{savedBlog?.userId.fullName}</TableCell>
+                                    <TableCell>{savedBlog?.blogId.address}</TableCell>
                                     <TableCell>
-                                        {blog.createdAt &&
-                                            moment(blog.createdAt).format("DD-MM-YYYY")}
+                                        {savedBlog?.blogId.createdAt &&
+                                            moment(savedBlog?.blogId.createdAt).format(
+                                                "DD-MM-YYYY"
+                                            )}
                                     </TableCell>
                                     <TableCell
                                         align="right"
@@ -108,7 +112,7 @@ export default function SavedBlogList() {
                                         <Button
                                             variant="contained"
                                             color="error"
-                                            onClick={() => onClickDelete(blog?._id)}
+                                            onClick={() => onClickDelete(savedBlog?._id)}
                                         >
                                             Xóa Blog
                                         </Button>
@@ -117,7 +121,9 @@ export default function SavedBlogList() {
                                             variant="contained"
                                             color="primary"
                                             onClick={() =>
-                                                router.push(`/blog/${blog?._id}`)
+                                                router.push(
+                                                    `/blog/${savedBlog?.blogId._id}`
+                                                )
                                             }
                                         >
                                             Thông tin chi tiết

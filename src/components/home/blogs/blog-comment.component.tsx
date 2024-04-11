@@ -11,23 +11,26 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
-import addCommentAction from "@/actions/comment/add-comment.action";
 import { I_Comment } from "@/interfaces/comment.interface";
 import moment from "moment";
 import { AppContext } from "@/providers/app-provider";
 import { UserContext } from "@/providers/user-provider";
+import { useRouter } from "next/navigation";
+import addCommentAction from "@/actions/comment/add-comment.action";
 import addNotificationAction from "@/actions/notification/add-notification.action";
-import { WebSocketContext } from "@/providers/socket.provider";
+import { I_Blog } from "@/interfaces/blog.interface";
 
 export default function BlogComment({
-    blogId,
+    blog,
     commentList,
     setCommentNumber,
 }: {
-    blogId: string;
+    blog: I_Blog;
     commentList: I_Comment[];
     setCommentNumber: Dispatch<SetStateAction<number>>;
 }) {
+    const router = useRouter();
+
     const { token } = useContext(AppContext);
     const { user } = useContext(UserContext);
     // const { socket } = useContext(WebSocketContext);
@@ -37,10 +40,11 @@ export default function BlogComment({
 
     const handleComment = async (formData: FormData) => {
         const content = String(formData.get("comment"));
-        await addCommentAction(blogId, content);
+        await addCommentAction(blog?._id, content);
         await addNotificationAction(
+            blog?.user._id,
             `${user.fullName} đã comment bài blog của bạn!`,
-            blogId
+            blog?._id
         );
         setComment("");
         setComments((prev) => [
@@ -72,9 +76,13 @@ export default function BlogComment({
     //     }
     // }, []);
 
+    const navigateToProfile = (userId: string) => {
+        router.push(`/profile/${userId}`);
+    };
+
     return (
         <Stack sx={{ paddingY: 1 }} spacing={1}>
-            {comments[0] ? (
+            {comments[0] &&
                 comments.map((comment) => (
                     <Box display={"flex"} alignItems={"start"} gap={1} key={comment?._id}>
                         <Avatar src={comment?.user.avatar} />
@@ -87,7 +95,11 @@ export default function BlogComment({
                             }}
                         >
                             <Box display={"flex"} alignItems={"center"} gap={1}>
-                                <Typography fontWeight={600}>
+                                <Typography
+                                    fontWeight={600}
+                                    sx={{ cursor: "pointer" }}
+                                    onClick={() => navigateToProfile(comment?.user._id)}
+                                >
                                     {comment?.user.fullName}
                                 </Typography>
                                 <Typography>-</Typography>
@@ -98,10 +110,7 @@ export default function BlogComment({
                             <Typography>{comment?.content}</Typography>
                         </Box>
                     </Box>
-                ))
-            ) : (
-                <></>
-            )}
+                ))}
 
             <Box
                 display={"flex"}

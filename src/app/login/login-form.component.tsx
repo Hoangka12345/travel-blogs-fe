@@ -33,8 +33,7 @@ import { WebSocketContext } from "@/providers/socket.provider";
 export default function LoginForm() {
     const router = useRouter();
 
-    const { updateAccessToken } = useContext(AppContext);
-    const { updateUser } = useContext(UserContext);
+    const { updateAccessToken, updateUserId } = useContext(AppContext);
     // const { socket } = useContext(WebSocketContext);
 
     const [showPassword, setShowPassword] = useState(false);
@@ -108,7 +107,9 @@ export default function LoginForm() {
                             access_token: res.data.access_token,
                             refresh_token: res.data.refresh_token,
                         });
-                        updateUser(res.data.user);
+                        console.log(">>>login userid: ", res.data.user._id);
+
+                        updateUserId(res.data.user._id);
                         // if (socket) {
                         //     socket.connect();
                         //     socket.on("connection", (id) => {

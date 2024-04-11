@@ -24,16 +24,16 @@ export default function RootLayout({
     const cookieStore = cookies();
     const access_token = cookieStore.get("access_token")?.value;
     const refresh_token = cookieStore.get("refresh_token")?.value;
-    const userCookie = cookieStore.get("user");
-
-    if (userCookie) {
-        userInfo = JSON.parse(userCookie?.value);
-    }
+    const userId = cookieStore.get("userId")?.value;
 
     return (
         <html lang="en">
             <body>
-                <AppProvider access_token={access_token} refresh_token={refresh_token}>
+                <AppProvider
+                    access_token={access_token}
+                    refresh_token={refresh_token}
+                    userId={userId}
+                >
                     <WebSocketProvider>
                         <UserProvider userInfo={userInfo}>
                             <BlogProvider>

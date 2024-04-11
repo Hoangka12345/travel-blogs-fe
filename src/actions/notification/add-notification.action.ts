@@ -3,7 +3,7 @@
 import { I_Response } from "@/interfaces/response.interface"
 import { cookies } from "next/headers"
 
-export default async function addNotificationAction(content: string, blog: string): Promise<I_Response<any>> {
+export default async function addNotificationAction(recipient: string, content: string, blogId: string): Promise<I_Response<any>> {
     const cookieStore = cookies()
     const access_token = cookieStore.get('access_token')
 
@@ -14,7 +14,7 @@ export default async function addNotificationAction(content: string, blog: strin
                 'Authorization': `Bearer ${access_token?.value}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ content, blog })
+            body: JSON.stringify({ content, blogId, recipient })
         })
         const res = await resPromise.json()
 

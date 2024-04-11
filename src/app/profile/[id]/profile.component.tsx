@@ -20,6 +20,8 @@ export default function Profile({ id }: { id: string }) {
             const data = await res.json();
 
             if (data.statusCode === 200) {
+                console.log(data);
+
                 setUser(data.data.user);
                 setBlogs(data.data.blogs);
             }
@@ -44,9 +46,7 @@ export default function Profile({ id }: { id: string }) {
                                 Họ và tên:
                             </Typography>
                             <Typography component={"span"} textAlign={"justify"}>
-                                {user?.lastName &&
-                                    user?.firstName &&
-                                    `${user.lastName} ${user.firstName}`}
+                                {user?.fullName}
                             </Typography>
                         </Box>
                         <Box>
@@ -71,7 +71,7 @@ export default function Profile({ id }: { id: string }) {
                                 Email:
                             </Typography>
                             <Typography component={"span"} textAlign={"justify"}>
-                                {user?.email && user.email}
+                                {user?.email}
                             </Typography>
                         </Box>
                         <Box>
@@ -91,9 +91,17 @@ export default function Profile({ id }: { id: string }) {
                 </Box>
             </Paper>
 
-            <Stack spacing={2}>
-                {blogs[0] && blogs.map((blog) => <Blog key={blog._id} blog={blog} />)}
-            </Stack>
+            {blogs.length > 0 ? (
+                <Stack spacing={2}>
+                    {blogs && blogs.map((blog) => <Blog key={blog._id} blog={blog} />)}
+                </Stack>
+            ) : (
+                <Paper sx={{ p: 4, textAlign: "center" }}>
+                    <Typography color={"red"} variant="h4">
+                        Người dùng chưa đăng tải blog nào!
+                    </Typography>
+                </Paper>
+            )}
         </Box>
     );
 }

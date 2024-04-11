@@ -12,7 +12,10 @@ export interface I_Blog {
         fullName: string,
         avatar: string
     }
+    comments: I_Comment[],
+    reactionCount: number,
+    commentCount: number,
     createdAt: string;
     isSaved?: boolean;
-    isLike?: boolean;
+    isLiked?: boolean;
 }

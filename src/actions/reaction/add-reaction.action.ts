@@ -8,8 +8,8 @@ export default async function addReactionAction(blogId: string): Promise<I_Respo
     const access_token = cookieStore.get('access_token')
 
     try {
-        const resPromise = await fetch(`${process.env.URL_API}/blog/add-reaction/${blogId}`, {
-            method: "PUT",
+        const resPromise = await fetch(`${process.env.URL_API}/reaction`, {
+            method: "POST",
             headers: {
                 'Authorization': `Bearer ${access_token?.value}`,
                 "Content-Type": "application/json"

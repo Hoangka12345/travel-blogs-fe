@@ -82,20 +82,11 @@ export default function Blog({ blog }: { blog: I_Blog }) {
     // }, []);
 
     useEffect(() => {
-        (async () => {
-            if (blog._id) {
-                const res = await fetch(`/api/get-comments-reactions/${blog._id}`);
-                const data = await res.json();
-
-                if (data.statusCode === 200) {
-                    setLikeNumber(data.data.reactionNumber);
-                    setCommentNumber(data.data.commentNumber);
-                    setCommentList(data.data.comments);
-                    setIsLike(() => (blog.isLike ? true : false));
-                    setIsSaved(() => (blog.isSaved ? true : false));
-                }
-            }
-        })();
+        setLikeNumber(blog.reactionCount);
+        setCommentNumber(blog.commentCount);
+        setCommentList(blog.comments);
+        setIsLike(() => (blog.isLiked ? true : false));
+        setIsSaved(() => (blog.isSaved ? true : false));
     }, [blog]);
 
     // convert date to time ago using moment
@@ -126,6 +117,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                 const res = await addReactionAction(blog._id);
                 if (res.status) {
                     await addNotificationAction(
+                        blog?.user._id,
                         `${user.fullName} đã like bài viết của bạn!`,
                         blog?._id
                     );
@@ -151,6 +143,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                 const res = await saveBlogAction(blog._id);
                 if (res.status) {
                     setIsSaved(true);
+                    toast.success("bạn đã lưu bài blog thành công!");
                 }
             }
         }
@@ -280,7 +273,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                 <Divider />
 
                 <BlogComment
-                    blogId={blog._id}
+                    blog={blog}
                     commentList={commentList}
                     setCommentNumber={setCommentNumber}
                 />

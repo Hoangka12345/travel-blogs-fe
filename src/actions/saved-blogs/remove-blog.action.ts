@@ -4,18 +4,17 @@ import { I_Response } from "@/interfaces/response.interface"
 import { revalidateTag } from "next/cache"
 import { cookies } from "next/headers"
 
-export default async function removeBlogAction(blogId: string): Promise<I_Response<any>> {
+export default async function removeBlogAction(savedBlogId: string): Promise<I_Response<any>> {
     const cookieStore = cookies()
     const access_token = cookieStore.get('access_token')
 
     try {
-        const resPromise = await fetch(`${process.env.URL_API}/user/remove-saved-blog`, {
-            method: "PUT",
+        const resPromise = await fetch(`${process.env.URL_API}/saved-blog/${savedBlogId}`, {
+            method: "DELETE",
             headers: {
                 'Authorization': `Bearer ${access_token?.value}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ blogId })
         })
         const res = await resPromise.json()
 

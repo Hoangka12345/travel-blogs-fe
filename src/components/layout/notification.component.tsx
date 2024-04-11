@@ -114,7 +114,7 @@ export default function Notification() {
                             onClick={() =>
                                 handleClickNotification(
                                     notification?._id,
-                                    notification?.blog
+                                    notification?.blogId
                                 )
                             }
                         >

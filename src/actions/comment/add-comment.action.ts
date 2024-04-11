@@ -8,20 +8,20 @@ export default async function addCommentAction(blogId: string, content: string):
     const access_token = cookieStore.get('access_token')
 
     try {
-        const resPromise = await fetch(`${process.env.URL_API}/blog/add-comment/${blogId}`, {
-            method: "PUT",
+        const res = await fetch(`${process.env.URL_API}/comment`, {
+            method: "POST",
             headers: {
                 'Authorization': `Bearer ${access_token?.value}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ content })
+            body: JSON.stringify({ blogId, content })
         })
-        const res = await resPromise.json()
+        const data = await res.json()
 
-        if (res.statusCode === 200) {
+        if (data.statusCode === 200) {
             return { status: true }
         }
-        return { status: false, message: res.message }
+        return { status: false, message: data.message }
     } catch (error) {
         throw error
     }
