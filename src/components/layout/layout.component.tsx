@@ -7,7 +7,6 @@ import NavigationBar from "./navigation-bar.component";
 import HeaderLayout from "./header.component";
 import { usePathname } from "next/navigation";
 import { useContext, useEffect, useMemo } from "react";
-import { useLocalStorage } from "../hooks/localstorage.hook";
 import { AppContext } from "@/providers/app-provider";
 import { UserContext } from "@/providers/user-provider";
 
