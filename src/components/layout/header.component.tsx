@@ -13,7 +13,7 @@ import {
 import { styled, alpha, createTheme } from "@mui/material/styles";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AppContext } from "@/providers/app-provider";
 import { UserContext } from "@/providers/user-provider";
 import getBlogBySearch from "@/actions/blog/search.action";
@@ -48,6 +48,7 @@ const theme = createTheme();
 
 export default function HeaderLayout() {
     const router = useRouter();
+    const pathname = usePathname();
     const { token } = useContext(AppContext);
     const { user } = useContext(UserContext);
     const { updateBlogs } = useContext(BlogContext);
@@ -74,10 +75,10 @@ export default function HeaderLayout() {
 
     return (
         <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
-            <Box component={"form"} action={handleSearch}>
+            <Box component={"form"} width={"50%"} action={handleSearch}>
                 <Search>
                     <SearchIconWrapper>
-                        <SearchIcon />
+                        <SearchIcon color={pathname === "/" ? "action" : "disabled"} />
                     </SearchIconWrapper>
                     <TextField
                         name="search"
@@ -90,6 +91,7 @@ export default function HeaderLayout() {
                         size="small"
                         placeholder="Tìm kiếm địa điểm du lịch…"
                         inputProps={{ "aria-label": "search" }}
+                        disabled={pathname !== "/" ? true : false}
                     />
                 </Search>
             </Box>
