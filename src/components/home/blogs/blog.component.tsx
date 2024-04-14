@@ -82,18 +82,18 @@ export default function Blog({ blog }: { blog: I_Blog }) {
     // }, []);
 
     useEffect(() => {
-        setLikeNumber(blog.reactionCount);
-        setCommentNumber(blog.commentCount);
-        setCommentList(blog.comments);
-        setIsLike(() => (blog.isLiked ? true : false));
-        setIsSaved(() => (blog.isSaved ? true : false));
+        setLikeNumber(blog?.reactionCount);
+        setCommentNumber(blog?.commentCount);
+        setCommentList(blog?.comments || []);
+        setIsLike(() => (blog?.isLiked ? true : false));
+        setIsSaved(() => (blog?.isSaved ? true : false));
     }, [blog]);
 
     // convert date to time ago using moment
     const timeAgo = useMemo(() => {
-        const createdTime = new Date(blog.createdAt);
+        const createdTime = new Date(blog?.createdAt);
         return moment(createdTime).fromNow();
-    }, [blog.createdAt]);
+    }, [blog?.createdAt]);
 
     const handleCloseSlide = () => setOpenSlide(false);
     const handleOpenSlide = (index: number) => {
@@ -149,18 +149,24 @@ export default function Blog({ blog }: { blog: I_Blog }) {
         }
     };
 
+    const navigateToBlogDetail = () => {
+        router.push(`/blog/${blog?._id}`);
+    };
+
+    console.log(blog?.comments);
+
     return (
         <Paper sx={{ paddingTop: 1, paddingX: 1 }}>
             {/* name */}
             <Box display={"flex"} alignItems={"center"} justifyContent={"space-between"}>
                 <ListItem>
                     <ListItemAvatar sx={{ cursor: "pointer" }} onClick={onClickProfile}>
-                        <Avatar src={blog.user.avatar && blog.user.avatar} />
+                        <Avatar src={blog?.user?.avatar} />
                     </ListItemAvatar>
                     <ListItemText
                         onClick={onClickProfile}
                         sx={{ cursor: "pointer" }}
-                        primary={blog?.user.fullName}
+                        primary={blog?.user?.fullName}
                         secondary={timeAgo}
                     />
                 </ListItem>
@@ -183,7 +189,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                         Địa điểm du lịch:
                     </Typography>
                     <Typography component={"span"} textAlign={"justify"}>
-                        {blog.address && blog.address}
+                        {blog?.address}
                     </Typography>
                 </Box>
                 <Box>
@@ -191,7 +197,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                         Quốc gia:
                     </Typography>
                     <Typography component={"span"} textAlign={"justify"}>
-                        {blog.country && blog.country}
+                        {blog?.country}
                     </Typography>
                 </Box>
                 <Box>
@@ -199,7 +205,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                         Thành phố:
                     </Typography>
                     <Typography component={"span"} textAlign={"justify"}>
-                        {blog.city && blog.city}
+                        {blog?.city}
                     </Typography>
                 </Box>
                 <Box>
@@ -207,13 +213,13 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                         Nội dung nhận xét:
                     </Typography>
                     <Typography component={"span"} textAlign={"justify"}>
-                        {blog.content && blog.content}
+                        {blog?.content}
                     </Typography>
                 </Box>
             </Stack>
             {/* show images */}
             <ImageShow
-                images={blog.images ? blog.images : []}
+                images={blog?.images ? blog.images : []}
                 handleOpenSlide={handleOpenSlide}
             />
             {/* show reaction */}
@@ -240,6 +246,7 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                             textDecoration: "none",
                             "&:hover": { textDecoration: "underline" },
                         }}
+                        onClick={navigateToBlogDetail}
                     >
                         {commentNumber} bình luận
                     </Link>
@@ -264,7 +271,11 @@ export default function Blog({ blog }: { blog: I_Blog }) {
                         </Button>
                     </Box>
 
-                    <StackReaction direction={"row"} spacing={1}>
+                    <StackReaction
+                        direction={"row"}
+                        spacing={1}
+                        onClick={navigateToBlogDetail}
+                    >
                         <SmsIcon />
                         <Typography>Bình luận</Typography>
                     </StackReaction>

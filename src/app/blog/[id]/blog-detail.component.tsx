@@ -3,6 +3,7 @@
 import Blog from "@/components/home/blogs/blog.component";
 import { I_Blog } from "@/interfaces/blog.interface";
 import { AppContext } from "@/providers/app-provider";
+import { BlogContext } from "@/providers/blogs-provider";
 import { Box } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 
@@ -26,6 +27,7 @@ const initialBlog = {
 
 export default function BlogDetail({ id }: { id: string }) {
     const { token } = useContext(AppContext);
+    const { blogs, updateBlogs } = useContext(BlogContext);
 
     const [blog, setBlog] = useState<I_Blog>(initialBlog);
 
@@ -37,9 +39,7 @@ export default function BlogDetail({ id }: { id: string }) {
             });
             const data = await res.json();
             if (data.statusCode === 200) {
-                console.log(data);
-
-                setBlog(data.data);
+                updateBlogs([{ ...data.data }]);
             }
         };
 
@@ -50,11 +50,11 @@ export default function BlogDetail({ id }: { id: string }) {
                 await fetchGetBlog(`/api/get-blog/${id}`);
             }
         })();
-    }, []);
+    }, [id]);
 
     return (
         <Box>
-            <Blog blog={blog} />
+            <Blog blog={blogs[0]} />
         </Box>
     );
 }

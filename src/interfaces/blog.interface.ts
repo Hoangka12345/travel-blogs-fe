@@ -12,7 +12,7 @@ export interface I_Blog {
         fullName: string,
         avatar: string
     }
-    comments: I_Comment[],
+    comments?: I_Comment[],
     reactionCount: number,
     commentCount: number,
     createdAt: string;

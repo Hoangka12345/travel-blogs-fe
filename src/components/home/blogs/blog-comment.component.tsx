@@ -15,21 +15,22 @@ import { I_Comment } from "@/interfaces/comment.interface";
 import moment from "moment";
 import { AppContext } from "@/providers/app-provider";
 import { UserContext } from "@/providers/user-provider";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import addCommentAction from "@/actions/comment/add-comment.action";
 import addNotificationAction from "@/actions/notification/add-notification.action";
 import { I_Blog } from "@/interfaces/blog.interface";
 
 export default function BlogComment({
     blog,
-    commentList,
+    commentList = [],
     setCommentNumber,
 }: {
     blog: I_Blog;
-    commentList: I_Comment[];
+    commentList?: I_Comment[];
     setCommentNumber: Dispatch<SetStateAction<number>>;
 }) {
     const router = useRouter();
+    const pathname = usePathname();
 
     const { token } = useContext(AppContext);
     const { user } = useContext(UserContext);
@@ -48,20 +49,22 @@ export default function BlogComment({
         );
         setComment("");
         setComments((prev) => [
-            ...prev,
             {
                 user: { _id: user._id, avatar: user.avatar, fullName: user.fullName },
                 _id: String(Math.random()),
                 content: comment,
                 createdAt: String(new Date()),
             },
+            ...prev,
         ]);
         setCommentNumber((prev) => prev + 1);
     };
 
     useEffect(() => {
-        setComments(commentList.reverse());
-    }, [commentList]);
+        if (pathname.includes("blog/")) {
+            setComments(commentList);
+        }
+    }, [pathname, commentList]);
 
     // useEffect(() => {
     //     if (socket) {
