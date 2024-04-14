@@ -1,8 +1,7 @@
 import { z } from "zod";
 
 export const registerFormSchema = z.object({
-    firstName: z.string().nonempty("* Trường này không được thiếu!"),
-    lastName: z.string().nonempty("* Trường này không được thiếu!"),
+    fullName: z.string().nonempty("* Trường này không được thiếu!"),
     dateOfBirth: z.date(),
     email: z.string().nonempty("* Trường này không được thiếu!").email("* Định dạng email không hợp lệ"),
     password: z.string().nonempty("* Trường này không được thiếu!")

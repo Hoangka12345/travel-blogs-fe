@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 import {
     Avatar,
     Box,
@@ -13,7 +13,7 @@ import {
 import { styled, alpha, createTheme } from "@mui/material/styles";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AppContext } from "@/providers/app-provider";
 import { UserContext } from "@/providers/user-provider";
 import getBlogBySearch from "@/actions/blog/search.action";
@@ -49,6 +49,8 @@ const theme = createTheme();
 export default function HeaderLayout() {
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
+
     const { token } = useContext(AppContext);
     const { user } = useContext(UserContext);
     const { updateBlogs } = useContext(BlogContext);
@@ -57,20 +59,19 @@ export default function HeaderLayout() {
 
     const onClickProfile = () => router.push(`/profile/${user._id}`);
 
+    const createQueryString = useCallback(
+        (name: string, value: string) => {
+            const params = new URLSearchParams(searchParams.toString());
+            params.set(name, value);
+
+            return params.toString();
+        },
+        [searchParams]
+    );
+
     const handleSearch = async (formData: FormData) => {
         const search = String(formData.get("search"));
-        if (token.access_token) {
-            const res = await getBlogBySearchWhenLogin(search, 1);
-
-            if (res.status) {
-                updateBlogs(res.data);
-            }
-        } else {
-            const res = await getBlogBySearch(search, 1);
-            if (res.status) {
-                updateBlogs(res.data);
-            }
-        }
+        router.push(pathname + "?" + createQueryString("search", search));
     };
 
     return (

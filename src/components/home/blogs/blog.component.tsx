@@ -153,8 +153,6 @@ export default function Blog({ blog }: { blog: I_Blog }) {
         router.push(`/blog/${blog?._id}`);
     };
 
-    console.log(blog?.comments);
-
     return (
         <Paper sx={{ paddingTop: 1, paddingX: 1 }}>
             {/* name */}

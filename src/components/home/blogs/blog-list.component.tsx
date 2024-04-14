@@ -6,6 +6,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "@/providers/app-provider";
 import { BlogContext } from "@/providers/blogs-provider";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import SkenetonComponent from "@/components/skeneton.component";
 
 export default function BlogList() {
     const router = useRouter();
@@ -25,6 +26,14 @@ export default function BlogList() {
             return getPage;
         }
         return 1;
+    }, [searchParams]);
+
+    const search = useMemo(() => {
+        const getPage = searchParams.get("search");
+        if (getPage) {
+            return getPage;
+        }
+        return "";
     }, [searchParams]);
 
     const fetchBlogsApi = async (api: string) => {
@@ -47,12 +56,16 @@ export default function BlogList() {
         (async () => {
             setPage(Number(currentPage));
             if (token.access_token) {
-                await fetchBlogsApi(`/api/get-login-blogs?page=${currentPage}`);
+                await fetchBlogsApi(
+                    `/api/get-login-blogs?page=${currentPage}&search=${search}`
+                );
             } else {
-                await fetchBlogsApi(`/api/get-blogs?page=${currentPage}`);
+                await fetchBlogsApi(
+                    `/api/get-blogs?page=${currentPage}&search=${search}`
+                );
             }
         })();
-    }, [token, currentPage]);
+    }, [token, currentPage, search]);
 
     const createQueryString = useCallback(
         (name: string, value: string) => {
@@ -73,7 +86,7 @@ export default function BlogList() {
     };
 
     return loading ? (
-        <CircularProgress />
+        <SkenetonComponent />
     ) : (
         <Stack spacing={2} mb={1}>
             {blogs[0] &&

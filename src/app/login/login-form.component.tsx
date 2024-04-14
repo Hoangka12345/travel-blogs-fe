@@ -107,7 +107,6 @@ export default function LoginForm() {
                             access_token: res.data.access_token,
                             refresh_token: res.data.refresh_token,
                         });
-                        console.log(">>>login userid: ", res.data.user._id);
 
                         updateUserId(res.data.user._id);
                         // if (socket) {

@@ -28,8 +28,7 @@ interface I_registerField {
 
 interface IErrors {
     [key: string]: string;
-    firstName: string;
-    lastName: string;
+    fullName: string;
     dateOfBirth: string;
     email: string;
     password: string;
@@ -37,8 +36,7 @@ interface IErrors {
 }
 
 const registerFields: I_registerField[] = [
-    { name: "firstName", label: "First name", type: "text" },
-    { name: "lastName", label: "Last name", type: "text" },
+    { name: "fullName", label: "Full name", type: "text" },
     { name: "dateOfBirth", label: "Date of birth", type: "date" },
     { name: "email", label: "Email", type: "text" },
     { name: "password", label: "Password", type: "text" },
@@ -48,8 +46,7 @@ const registerFields: I_registerField[] = [
 export default function RegisterForm() {
     const router = useRouter();
     const [errors, setErrors] = React.useState<IErrors>({
-        firstName: "",
-        lastName: "",
+        fullName: "",
         dateOfBirth: "",
         email: "",
         password: "",
@@ -105,8 +102,7 @@ export default function RegisterForm() {
 
     const handleRegister = async (formData: FormData) => {
         const data = {
-            firstName: formData.get("firstName"),
-            lastName: formData.get("lastName"),
+            fullName: formData.get("fullName"),
             dateOfBirth: new Date(String(formData.get("dateOfBirth"))),
             email: formData.get("email"),
             password: formData.get("password"),
@@ -119,8 +115,7 @@ export default function RegisterForm() {
 
             setErrors({
                 ...errors,
-                firstName: zodErrors.firstName ? zodErrors.firstName[0] : "",
-                lastName: zodErrors.lastName ? zodErrors.lastName[0] : "",
+                fullName: zodErrors.fullName ? zodErrors.fullName[0] : "",
                 dateOfBirth: zodErrors.dateOfBirth ? zodErrors.dateOfBirth[0] : "",
                 email: zodErrors.email ? zodErrors.email[0] : "",
                 password: zodErrors.password ? zodErrors.password[0] : "",
